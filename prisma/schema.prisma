@@ -1,0 +1,183 @@
+// CarBikeKharido.com — relational schema
+// © VidyaLabs. All Rights Reserved.
+//
+// Money is stored as integer minor units (paise) throughout. Never use a float
+// for currency: 0.1 + 0.2 !== 0.3 in IEEE-754, and rounding drift on a ₹15 lakh
+// on-road calculation is a support ticket waiting to happen. Percentages are
+// stored as Decimal for the same reason.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Prisma 7 moved the connection URL out of the schema: migrations read it from
+// prisma.config.ts, and the client receives a driver adapter at construction.
+datasource db {
+  provider = "postgresql"
+}
+
+enum VehicleType {
+  CAR
+  BIKE
+}
+
+enum FuelType {
+  PETROL
+  DIESEL
+  CNG
+  ELECTRIC
+  HYBRID
+}
+
+enum TransmissionType {
+  MANUAL
+  AUTO_AMT
+  AUTO_TORQUE_CONVERTER
+  EV
+}
+
+enum ImageType {
+  HERO_CUTOUT
+  STUDIO_360
+  PRESS_EDITORIAL
+  INTERIOR
+}
+
+/// A model line, e.g. "Tata Nexon" or "Royal Enfield Classic 350".
+/// Layman-facing fields live here so a card can render without joining.
+model Vehicle {
+  id     String      @id @default(cuid())
+  slug   String      @unique
+  name   String
+  type   VehicleType
+  brand  String
+  /// "Compact SUV", "Cruiser", "Scooter" — shown to buyers verbatim.
+  bodyType String
+
+  /// Bharat NCAP stars. Null for bikes, which are not crash-rated in India.
+  safetyRatingNCAP Int?
+  isElectric       Boolean @default(false)
+
+  /// Luggage expressed the way people actually pack: number of large
+  /// suitcases. Null for bikes.
+  luggageCapacityBags Int?
+
+  /// Real-world efficiency, not the certified claim. For EVs this is the
+  /// equivalent km per kWh so the column stays meaningful across powertrains.
+  realMileageKmPerLitre Decimal @db.Decimal(5, 2)
+
+  /// One-line plain-English promise, e.g. "Families who put crash safety first".
+  bestForHeadline String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  variants Variant[]
+  colors   Color[]
+  images   VehicleImage[]
+
+  @@index([type, brand])
+}
+
+/// A purchasable trim. Prices are per-variant because that is how dealers quote.
+model Variant {
+  id        String  @id @default(cuid())
+  vehicleId String
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  name             String
+  fuelType         FuelType
+  transmissionType TransmissionType
+
+  /// Ex-showroom price in paise. Named `...Pence` per the agreed schema
+  /// contract; the unit is Indian paise (1 rupee = 100 paise).
+  exShowroomPricePence BigInt
+
+  /// Null for electric vehicles, which have no engine displacement.
+  engineCc        Int?
+  seatingCapacity Int
+  /// Drives the "most bought" flag on the variant table.
+  isPopular       Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([vehicleId, name])
+  @@index([vehicleId, isPopular])
+}
+
+/// A paint option. `imaginStudioColorCode` maps our colour to the IMAGIN.studio
+/// CDN so the 360° viewer can render the right shade.
+model Color {
+  id        String  @id @default(cuid())
+  vehicleId String
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  name                  String
+  hexCode               String
+  imaginStudioColorCode String?
+  /// The manufacturer's own paint name, which often differs from ours.
+  oemPaintName          String?
+
+  @@unique([vehicleId, name])
+}
+
+model VehicleImage {
+  id        String  @id @default(cuid())
+  vehicleId String
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  url     String
+  type    ImageType
+  caption String?
+
+  @@index([vehicleId, type])
+}
+
+/// State-wise road tax, banded by ex-showroom price. The engine picks the row
+/// whose [priceMin, priceMax) window contains the variant price.
+model RtoTaxRule {
+  id        String      @id @default(cuid())
+  stateCode String
+  vehicleType VehicleType
+  /// Null means the band applies to every fuel type in that state. A row with
+  /// an explicit fuel type wins over a null row, which is how EV exemptions and
+  /// CNG rebates are modelled without duplicating every band.
+  fuelType  FuelType?
+
+  /// Inclusive lower bound and exclusive upper bound, in paise.
+  priceMin BigInt
+  priceMax BigInt
+
+  taxPercentage  Decimal @db.Decimal(5, 2)
+  /// Additional state cess levied on top of the base tax.
+  cessPercentage Decimal @default(0) @db.Decimal(5, 2)
+  /// Flat charges (smart card, number plate) in paise.
+  fixedFee       BigInt  @default(0)
+
+  updatedAt DateTime @updatedAt
+
+  @@index([stateCode, vehicleType, fuelType])
+}
+
+/// Insurance is banded by engine displacement, per IRDAI's third-party tariff.
+model InsuranceRule {
+  id          String      @id @default(cuid())
+  vehicleType VehicleType
+
+  /// Displacement window in cc. EVs are matched on a 0-0 band.
+  engineCcMin Int
+  engineCcMax Int
+
+  /// Statutory third-party premium for one year, in paise. The engine
+  /// multiplies this by the bundled term (3 years for cars, 5 for bikes).
+  baseThirdParty1Yr BigInt
+  /// Own-damage premium as a percentage of ex-showroom price.
+  ownDamagePercentage Decimal @db.Decimal(5, 3)
+  /// Compulsory personal accident cover for the owner-driver, in paise.
+  mandatoryCpaFee   BigInt
+
+  updatedAt DateTime @updatedAt
+
+  @@index([vehicleType, engineCcMin, engineCcMax])
+}
