@@ -9,7 +9,7 @@ import { TrendingVehicles } from "@/components/TrendingVehicles";
 import { getPricingRules, getVehicles } from "@/lib/catalogue/repository";
 
 export default async function HomePage() {
-  const [vehicles, { rtoRules, insuranceRules }] = await Promise.all([
+  const [vehicles, { rtoRules, rtoRates, insuranceRules }] = await Promise.all([
     getVehicles(),
     getPricingRules(),
   ]);
@@ -32,6 +32,7 @@ export default async function HomePage() {
         <FinancialSuite
           vehicles={vehicles}
           rtoRules={rtoRules}
+          rtoRates={rtoRates}
           insuranceRules={insuranceRules}
         />
         <QuickCompare vehicles={vehicles} />

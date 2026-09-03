@@ -41,7 +41,7 @@ import { fetchRapidSpecs, specsFromRapidMatch } from "@/lib/providers/rapidapi";
 import { vehiclePath } from "@/lib/routes";
 import { siteConfig } from "@/lib/siteConfig";
 import type { Variant as DetailVariant } from "@/lib/types";
-import { carPhotos } from "@/lib/vehiclePhotos.generated";
+import { getVehicleImageSrc, toCarPhotos } from "@/utils/getVehicleImage";
 import {
   getOwnerReviews,
   getReviewSections,
@@ -98,7 +98,7 @@ function similarFromPool(
         name: item.name,
         brand: item.brand,
         priceLabel: `From ${formatPaiseCompact(from)}`,
-        imageUrl: item.images[0]?.url ?? carPhotos[item.slug]?.[0]?.src,
+        imageUrl: getVehicleImageSrc(item.slug),
         kind,
       };
     });
@@ -144,7 +144,7 @@ export async function VehicleDetailsPage({
     permanentRedirect(vehiclePath(vehicle));
   }
 
-  const [allVehicles, { rtoRules, insuranceRules }] = await Promise.all([
+  const [allVehicles, { rtoRules, rtoRates, insuranceRules }] = await Promise.all([
     getVehicles(),
     getPricingRules(),
   ]);
@@ -153,7 +153,8 @@ export async function VehicleDetailsPage({
     resolveVehicleMedia(vehicle),
     fetchRapidSpecs(vehicle),
   ]);
-  const photos = media.photos.length > 0 ? media.photos : (carPhotos[vehicle.slug] ?? []);
+  const photos =
+    media.photos.length > 0 ? media.photos : toCarPhotos(vehicle.slug);
   const editorial = carDetails[vehicle.slug];
   const specGroups = [
     ...getSpecGroups(vehicle),
@@ -207,6 +208,7 @@ export async function VehicleDetailsPage({
                 <PriceHero
                   vehicle={vehicle}
                   rtoRules={rtoRules}
+                  rtoRates={rtoRates}
                   insuranceRules={insuranceRules}
                 />
                 <div className="space-y-4">
@@ -229,6 +231,7 @@ export async function VehicleDetailsPage({
                     vehicle={vehicle}
                     cities={cities}
                     rtoRules={rtoRules}
+                    rtoRates={rtoRates}
                     insuranceRules={insuranceRules}
                     initialVariantId={headline.id}
                     initialCityId={cities[0].id}
@@ -388,6 +391,7 @@ export async function VehicleDetailsPage({
                   <VdpMoreTools
                     vehicle={vehicle}
                     rtoRules={rtoRules}
+                    rtoRates={rtoRates}
                     insuranceRules={insuranceRules}
                   />
                 </div>

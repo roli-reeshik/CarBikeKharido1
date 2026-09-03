@@ -205,11 +205,19 @@ export async function addVehicleImage(
   if (!prisma) return { ok: false, message: DB_REQUIRED };
 
   try {
-    await prisma.vehicleImage.create({
+    const categoryMap = {
+      HERO_CUTOUT: "HERO",
+      STUDIO_360: "STUDIO_360",
+      PRESS_EDITORIAL: "EXTERIOR",
+      INTERIOR: "INTERIOR",
+    } as const;
+
+    await prisma.localMedia.create({
       data: {
         vehicleId: parsed.data.vehicleId,
-        url: parsed.data.url,
-        type: parsed.data.type,
+        localPath: parsed.data.url,
+        category: categoryMap[parsed.data.type],
+        isHero: parsed.data.type === "HERO_CUTOUT",
         caption: parsed.data.caption ?? null,
       },
     });

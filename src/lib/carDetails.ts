@@ -1155,4 +1155,390 @@ export const carDetails: Record<string, CarDetail> = {
       },
     ],
   },
+
+  "mahindra-thar": {
+    overview:
+      "The Thar ROXX is the five-door Thar: you still get the boxy stance and a proper 4x4 option, but the cabin is now something you can live with every weekday. The diesel automatic is the one that makes sense if the weekday is a city commute and the weekend is a dirt track. It drinks diesel, and it is tall — both are the point.",
+    specGroups: [
+      {
+        label: "Engine & gearbox",
+        items: [
+          { label: "Engine", value: "2.2-litre diesel or 2.0-litre turbo petrol" },
+          { label: "Power", value: "172 bhp (diesel)", plain: "Enough to climb, not to race" },
+          { label: "Gearbox", value: "6-speed automatic", plain: "The weekday version — no clutch in traffic" },
+          { label: "Also sold as", value: "Petrol manual, diesel 4x2 and 4x4" },
+        ],
+      },
+      {
+        label: "Size & space",
+        items: [
+          { label: "Doors", value: "5", plain: "Rear passengers no longer climb over a barrel" },
+          { label: "Boot", value: "About 3 large suitcases", plain: "Weekend kit, not a family airport run" },
+          { label: "Seats", value: "5" },
+          { label: "Ground clearance", value: "233 mm", plain: "Ruts and water crossings are the brief" },
+        ],
+      },
+      {
+        label: "Running costs",
+        items: [
+          { label: "Real-world economy", value: "11 km/l diesel", plain: "City plus a weekend trail, air-con on" },
+          { label: "Service interval", value: "Every 10,000 km or 12 months" },
+        ],
+      },
+      {
+        label: "Safety",
+        items: [
+          { label: "Bharat NCAP", value: "5 stars" },
+          { label: "Airbags", value: "6 on popular trims" },
+          { label: "Also fitted", value: "Stability control, hill-descent, 360° camera on AX7 L" },
+        ],
+      },
+    ],
+    variants: [
+      {
+        id: "mx1",
+        name: "MX1 Petrol",
+        exShowroom: 12_99_000,
+        gearbox: "Manual",
+        fuel: "Petrol",
+        headline: "The way in — same shape, fewer toys.",
+        keyKit: ["6 airbags", "Manual climate control", "Rear camera"],
+      },
+      {
+        id: "ax5",
+        name: "AX5 Petrol",
+        exShowroom: 15_49_000,
+        gearbox: "Manual",
+        fuel: "Petrol",
+        headline: "Adds the screen and the kit you will actually use.",
+        keyKit: ["Touchscreen", "Cruise control", "Alloy wheels"],
+      },
+      {
+        id: "ax7l",
+        name: "AX7 L Diesel Automatic",
+        exShowroom: 18_99_000,
+        gearbox: "Automatic",
+        fuel: "Diesel",
+        headline: "The weekday-and-weekend trim most buyers sign.",
+        keyKit: ["Torque-converter automatic", "Sunroof", "360° camera", "ADAS on this trim"],
+        isValuePick: true,
+      },
+      {
+        id: "ax7l-4wd",
+        name: "AX7 L Diesel 4WD Automatic",
+        exShowroom: 21_49_000,
+        gearbox: "Automatic",
+        fuel: "Diesel",
+        headline: "The one you want if the dirt is not optional.",
+        keyKit: ["Selectable 4WD", "Hill-descent", "All-terrain tyres"],
+      },
+    ],
+    colours: [
+      { id: "everest-white", name: "Everest White", swatch: ["#f3f5f6"] },
+      { id: "napoli-black", name: "Napoli Black", swatch: ["#14161a"] },
+      { id: "deep-forest", name: "Deep Forest", swatch: ["#3d4a38"] },
+      { id: "stealth-black", name: "Stealth Black", swatch: ["#2a2c2e"] },
+    ],
+    reviews: {
+      ownerRating: 4.3,
+      ownerCount: 1_240,
+      expertRating: 4.2,
+      loved: [
+        "Looks like a Thar, seats like a family SUV",
+        "Diesel automatic is calm in city traffic",
+        "Ground clearance you can see from the pavement",
+      ],
+      watchOut: [
+        "Fuel bills are not compact-SUV bills",
+        "Width and height need a measured garage",
+        "Soft-roader tyres on lower trims are not trail rubber",
+      ],
+      quotes: [
+        {
+          author: "Rohit K.",
+          city: "Gurugram",
+          months: 8,
+          rating: 5,
+          text: "Weekdays to Cyber Hub, Sundays toward Alwar. The five doors are why my parents finally agreed to sit in the back.",
+        },
+        {
+          author: "Meera D.",
+          city: "Pune",
+          months: 5,
+          rating: 4,
+          text: "It drinks diesel and I knew that. What I did not expect is how easy the automatic is in Baner traffic.",
+        },
+      ],
+    },
+    rivals: [
+      {
+        brand: "Mahindra",
+        model: "Thar 3-door",
+        priceFrom: 11_35_000,
+        stars: 4,
+        oneLiner: "The original — more character, less cabin.",
+        edge: "Lighter, cheaper, and still the poster Thar.",
+        gap: "Rear passengers climb in. Weekend luggage is a negotiation.",
+      },
+      {
+        brand: "Maruti Suzuki",
+        model: "Jimny",
+        priceFrom: 12_74_000,
+        stars: 3,
+        oneLiner: "A proper 4x4 in a much smaller box.",
+        edge: "Easier to park, and a genuine low-range gearbox.",
+        gap: "Four seats only, and a three-star crash score.",
+      },
+      {
+        brand: "Force",
+        model: "Gurkha",
+        priceFrom: 16_75_000,
+        stars: 0,
+        oneLiner: "More tractor than lifestyle SUV.",
+        edge: "Serious off-road hardware for the money.",
+        gap: "Ride and cabin are from another decade.",
+      },
+    ],
+  },
+
+  "ola-s1": {
+    overview:
+      "The S1 is the scooter you charge in a basement, not the one you queue for at a pump. The Pro pack is the one that survives a full week of office runs. Service and software updates are the conversation every owner has — buy it if you can live with a phone-app brand, not if you want a neighbourhood mechanic on speed-dial.",
+    specGroups: [
+      {
+        label: "Motor & battery",
+        items: [
+          { label: "Battery", value: "Up to 4 kWh on Pro packs" },
+          { label: "Real-world range", value: "About 110–140 km", plain: "City riding with a pillion some days" },
+          { label: "Home charging", value: "A normal 5A socket overnight" },
+        ],
+      },
+      {
+        label: "Size & use",
+        items: [
+          { label: "Under-seat", value: "A full-face helmet on most packs" },
+          { label: "Floorboard", value: "A grocery bag, not a crate" },
+          { label: "Seats", value: "2" },
+        ],
+      },
+      {
+        label: "Running costs",
+        items: [
+          { label: "Home charging", value: "About 25–40 paise per km" },
+          { label: "Service", value: "App-led; confirm a hub in your city first" },
+        ],
+      },
+    ],
+    variants: [
+      {
+        id: "s1x",
+        name: "S1 X",
+        exShowroom: 80_000,
+        gearbox: "Single-speed",
+        fuel: "Electric",
+        headline: "The short-range pack — a second scooter, not a touring tool.",
+        keyKit: ["Smaller battery", "Digital cluster", "App lock"],
+      },
+      {
+        id: "s1-air",
+        name: "S1 Air",
+        exShowroom: 90_000,
+        gearbox: "Single-speed",
+        fuel: "Electric",
+        headline: "A middle pack if you only commute across one city.",
+        keyKit: ["Mid battery", "Cruise mode", "USB charge"],
+      },
+      {
+        id: "s1-pro",
+        name: "S1 Pro",
+        exShowroom: 1_15_000,
+        gearbox: "Single-speed",
+        fuel: "Electric",
+        headline: "The pack most owners should actually sign.",
+        keyKit: ["Larger battery", "Better range", "Ride modes"],
+        isValuePick: true,
+      },
+      {
+        id: "s1-pro-plus",
+        name: "S1 Pro+",
+        exShowroom: 1_40_000,
+        gearbox: "Single-speed",
+        fuel: "Electric",
+        headline: "The top pack if you want the longest weekday buffer.",
+        keyKit: ["Largest battery", "Faster home charge on some kits"],
+      },
+    ],
+    colours: [
+      { id: "porcelain-white", name: "Porcelain White", swatch: ["#f4f6f7"] },
+      { id: "midnight-blue", name: "Midnight Blue", swatch: ["#1c3558"] },
+      { id: "jet-black", name: "Jet Black", swatch: ["#16181c"] },
+      { id: "liquid-silver", name: "Liquid Silver", swatch: ["#b8bec4"] },
+    ],
+    reviews: {
+      ownerRating: 3.9,
+      ownerCount: 5_120,
+      expertRating: 3.8,
+      loved: [
+        "Home charging kills the petrol-pump ritual",
+        "Silent roll-off in a housing society",
+        "The Pro range lasts a working week for many",
+      ],
+      watchOut: [
+        "Service wait times vary wildly by city",
+        "Software updates have left some owners stranded",
+        "Two-wheelers are not crash-rated in India",
+      ],
+      quotes: [
+        {
+          author: "Karan J.",
+          city: "Bengaluru",
+          months: 10,
+          rating: 4,
+          text: "I charge it next to the washing machine. That is the whole review. I would not buy it in a town without an Ola hub.",
+        },
+        {
+          author: "Sneha R.",
+          city: "Mumbai",
+          months: 7,
+          rating: 3,
+          text: "The scooter is fine. Getting a part replaced took three weeks. Ask about the nearest service hub before you pay.",
+        },
+      ],
+    },
+    rivals: [
+      {
+        brand: "TVS",
+        model: "iQube",
+        priceFrom: 94_000,
+        stars: 0,
+        oneLiner: "The safer service-network bet for most cities.",
+        edge: "A dealer you can walk into, almost everywhere.",
+        gap: "Less of the 'app scooter' theatre.",
+      },
+      {
+        brand: "Ather",
+        model: "450X",
+        priceFrom: 1_30_000,
+        stars: 0,
+        oneLiner: "Sharper to ride, usually dearer.",
+        edge: "The best fast-scooter chassis in this price band.",
+        gap: "You pay for that chassis.",
+      },
+    ],
+  },
+
+  "ducati-panigale-v4": {
+    overview:
+      "The Panigale V4 is a race bike with lights and a number plate. It is loud, low, and expensive to register in every state we quote. Buy it if you already know how a superbike sits — not as a first motorcycle, and not as a daily through Lucknow traffic. The V4 S is the one most buyers who have done the homework actually take home.",
+    specGroups: [
+      {
+        label: "Engine & ride",
+        items: [
+          { label: "Engine", value: "1,103 cc V4" },
+          { label: "Power", value: "About 215 bhp", plain: "Track figures. On the road you will use a sliver." },
+          { label: "Gearbox", value: "6-speed with a quickshifter", plain: "You still have a clutch lever; you rarely need it" },
+        ],
+      },
+      {
+        label: "Size & use",
+        items: [
+          { label: "Seat height", value: "About 850 mm", plain: "A stretch at every signal if you are not tall" },
+          { label: "Pillion", value: "A pad, not a seat", plain: "An hour is a conversation" },
+          { label: "Luggage", value: "None", plain: "A tank bag if you insist" },
+        ],
+      },
+      {
+        label: "Running costs",
+        items: [
+          { label: "Real-world economy", value: "About 14 km/l", plain: "Touring pace, not a laboratory claim" },
+          { label: "Service", value: "Ducati workshops only — budget for it" },
+        ],
+      },
+    ],
+    variants: [
+      {
+        id: "v4",
+        name: "Panigale V4",
+        exShowroom: 27_50_000,
+        gearbox: "Manual",
+        fuel: "Petrol",
+        headline: "The way into the V4 family.",
+        keyKit: ["V4 engine", "Riding modes", "Quickshifter"],
+      },
+      {
+        id: "v4s",
+        name: "Panigale V4 S",
+        exShowroom: 33_50_000,
+        gearbox: "Manual",
+        fuel: "Petrol",
+        headline: "The trim most buyers who have ridden one actually choose.",
+        keyKit: ["Öhlins suspension", "Lighter wheels", "Cornering ABS"],
+        isValuePick: true,
+      },
+      {
+        id: "v4s-corse",
+        name: "Panigale V4 S Corse",
+        exShowroom: 36_00_000,
+        gearbox: "Manual",
+        fuel: "Petrol",
+        headline: "The dressy S — same engine, louder livery.",
+        keyKit: ["Corse paint", "Öhlins kit", "Termignoni option on some packs"],
+      },
+    ],
+    colours: [
+      { id: "ducati-red", name: "Ducati Red", swatch: ["#c8102e"] },
+      { id: "dark-stealth", name: "Dark Stealth", swatch: ["#1a1c1f"] },
+    ],
+    reviews: {
+      ownerRating: 4.6,
+      ownerCount: 186,
+      expertRating: 4.7,
+      loved: [
+        "The sound is why people cross the showroom",
+        "Electronics that keep a very fast bike usable",
+        "It still looks like the poster after a year",
+      ],
+      watchOut: [
+        "Wrists and neck on a two-hour highway run",
+        "Service invoices are superbike invoices",
+        "Two-wheelers are not crash-rated in India",
+      ],
+      quotes: [
+        {
+          author: "Aditya S.",
+          city: "Mumbai",
+          months: 14,
+          rating: 5,
+          text: "I keep a scooter for the office. This is Sunday and the Western Express at 6 a.m. It is not a commuter and I did not pretend it was.",
+        },
+        {
+          author: "Farhan A.",
+          city: "Delhi",
+          months: 9,
+          rating: 4,
+          text: "The S is the one. The base V4 is still a Panigale, but once you have sat on the Öhlins you will not go back.",
+        },
+      ],
+    },
+    rivals: [
+      {
+        brand: "BMW",
+        model: "S 1000 RR",
+        priceFrom: 20_90_000,
+        stars: 0,
+        oneLiner: "The more usable superbike for Indian roads.",
+        edge: "A slightly less extreme riding position, and more dealers.",
+        gap: "It will never sound like a V4.",
+      },
+      {
+        brand: "Aprilia",
+        model: "RSV4",
+        priceFrom: 23_69_000,
+        stars: 0,
+        oneLiner: "The other Italian V4, usually a shade calmer.",
+        edge: "Electronics and a chassis people praise on track days.",
+        gap: "Fewer workshops outside the big cities.",
+      },
+    ],
+  },
 };

@@ -1,6 +1,11 @@
 import type { VehicleType } from "@/lib/catalogue/types";
 
-const KNOWN_BIKES = new Set(["royal-enfield-classic-350", "tvs-iqube"]);
+const KNOWN_BIKES = new Set([
+  "royal-enfield-classic-350",
+  "tvs-iqube",
+  "ola-s1",
+  "ducati-panigale-v4",
+]);
 
 /** Canonical public URL for a catalogue vehicle. */
 export function vehiclePath(vehicle: { type: VehicleType; slug: string }): string {

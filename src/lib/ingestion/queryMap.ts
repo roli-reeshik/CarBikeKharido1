@@ -56,6 +56,41 @@ export const RAPID_QUERY_PLANS: Record<string, RapidQueryPlan> = {
       { make: "tvs", model: "i qube" },
     ],
   },
+  "mahindra-thar": {
+    type: "CAR",
+    attempts: [
+      { make: "mahindra", model: "thar" },
+      { make: "mahindra", model: "thar roxx" },
+    ],
+  },
+  "tata-punch-ev": {
+    type: "CAR",
+    attempts: [
+      { make: "tata", model: "punch" },
+      { make: "tata", model: "punch ev" },
+    ],
+  },
+  "maruti-ertiga": {
+    type: "CAR",
+    attempts: [
+      { make: "suzuki", model: "ertiga" },
+      { make: "maruti", model: "ertiga" },
+    ],
+  },
+  "ola-s1": {
+    type: "BIKE",
+    attempts: [
+      { make: "ola", model: "s1" },
+      { make: "ola", model: "s1 pro" },
+    ],
+  },
+  "ducati-panigale-v4": {
+    type: "BIKE",
+    attempts: [
+      { make: "ducati", model: "panigale v4" },
+      { make: "ducati", model: "panigale" },
+    ],
+  },
 };
 
 export function queryPlanFor(

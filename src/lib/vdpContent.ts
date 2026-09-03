@@ -51,6 +51,7 @@ function carReviews(
   photos: CarPhoto[],
 ): VdpReviewSection[] {
   const bags = vehicle.luggageCapacityBags;
+  const bootLine = luggagePlain(bags, vehicle.bootSpaceLuggage);
   return [
     {
       id: "exterior",
@@ -88,10 +89,10 @@ function carReviews(
     {
       id: "boot",
       heading: "Boot space & practicality",
-      shortDescription: luggagePlain(bags),
+      shortDescription: bootLine,
       fullDescription:
         bags != null
-          ? `${luggagePlain(bags)}. That is enough for a long weekend: two large hard suitcases plus a duffel if you pack like a family, not like a catalogue. Rear seats fold nearly flat for a bicycle or a folded pram. The loading lip is low enough that you are not lifting a suitcase over your hip.`
+          ? `${bootLine}. That is enough for a long weekend: two large hard suitcases plus a duffel if you pack like a family, not like a catalogue. Rear seats fold nearly flat for a bicycle or a folded pram. The loading lip is low enough that you are not lifting a suitcase over your hip.`
           : "Two-wheeler — storage is whatever you strap on or slot under the seat.",
       imageUrl: photoAt(photos, 1),
     },
@@ -171,6 +172,16 @@ export function getReviewSections(
   vehicle: VehicleWithRelations,
   photos: CarPhoto[],
 ): VdpReviewSection[] {
+  if (vehicle.reviewSections.length > 0) {
+    return vehicle.reviewSections.map((section) => ({
+      id: section.sectionKey,
+      heading: section.title,
+      shortDescription: section.shortSummary,
+      fullDescription: section.fullReview,
+      imageUrl: section.imagePath ?? photoAt(photos, 0),
+    }));
+  }
+
   return vehicle.type === "BIKE"
     ? bikeReviews(vehicle, photos)
     : carReviews(vehicle, photos);
@@ -303,13 +314,6 @@ export const UPCOMING_SIMILARS: VdpSimilar[] = [
     name: "Mahindra Scorpio-N",
     brand: "Mahindra",
     priceLabel: "From ₹13.99 Lakh",
-    kind: "upcoming",
-  },
-  {
-    slug: null,
-    name: "Mahindra Thar",
-    brand: "Mahindra",
-    priceLabel: "From ₹11.35 Lakh",
     kind: "upcoming",
   },
 ];

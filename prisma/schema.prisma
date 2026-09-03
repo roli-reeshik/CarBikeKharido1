@@ -1,10 +1,19 @@
 // CarBikeKharido.com — relational schema
 // © VidyaLabs. All Rights Reserved.
+// Principal Developer: Rajesh Kumar · +91 9140878191 · rkrajesh.pgi@gmail.com
+// C725, Kalpana Residency, Phase-II, Hulaskhera, Raebareli Road,
+// Mohanlalganj, Lucknow, Uttar Pradesh - 226301
 //
 // Money is stored as integer minor units (paise) throughout. Never use a float
 // for currency: 0.1 + 0.2 !== 0.3 in IEEE-754, and rounding drift on a ₹15 lakh
 // on-road calculation is a support ticket waiting to happen. Percentages are
 // stored as Decimal for the same reason.
+//
+// The field is named `exShowroomPricePence` in the product contract. The unit
+// is Indian paise (1 rupee = 100 paise), not British pence. A Creta at
+// ₹11,00,000 ex-showroom is stored as 110000000, not 1100000 — Int would
+// overflow a ₹3 crore luxury car once converted to paise, so the column is
+// BigInt.
 
 generator client {
   provider = "prisma-client-js"
@@ -12,6 +21,7 @@ generator client {
 
 // Prisma 7 moved the connection URL out of the schema: migrations read it from
 // prisma.config.ts, and the client receives a driver adapter at construction.
+// Local default: postgresql://postgres:password@localhost:5432/carbikekharido?schema=public
 datasource db {
   provider = "postgresql"
 }
@@ -36,23 +46,28 @@ enum TransmissionType {
   EV
 }
 
-enum ImageType {
-  HERO_CUTOUT
-  STUDIO_360
-  PRESS_EDITORIAL
+enum MediaCategory {
+  HERO
+  EXTERIOR
   INTERIOR
+  PRACTICALITY
+  STUDIO_360
 }
 
-/// A model line, e.g. "Tata Nexon" or "Royal Enfield Classic 350".
+/// A model line, e.g. "Hyundai Creta" or "Ducati Panigale V4".
 /// Layman-facing fields live here so a card can render without joining.
 model Vehicle {
-  id     String      @id @default(cuid())
+  id     String      @id @default(uuid())
   slug   String      @unique
   name   String
-  type   VehicleType
   brand  String
-  /// "Compact SUV", "Cruiser", "Scooter" — shown to buyers verbatim.
+  type   VehicleType
+  /// "SUV", "Hatchback", "Superbike", "Cruiser" — shown to buyers verbatim.
   bodyType String
+
+  /// IMAGIN.studio make/model tokens for the 360° viewer.
+  imaginMake  String?
+  imaginModel String?
 
   /// Bharat NCAP stars. Null for bikes, which are not crash-rated in India.
   safetyRatingNCAP Int?
@@ -61,27 +76,31 @@ model Vehicle {
   /// Luggage expressed the way people actually pack: number of large
   /// suitcases. Null for bikes.
   luggageCapacityBags Int?
+  /// Plain-English boot line, e.g. "Fits 3 Large Suitcases".
+  bootSpaceLuggage    String?
 
-  /// Real-world efficiency, not the certified claim. For EVs this is the
-  /// equivalent km per kWh so the column stays meaningful across powertrains.
+  /// Numeric real-world efficiency. For EVs this is km per kWh.
   realMileageKmPerLitre Decimal @db.Decimal(5, 2)
+  /// Plain-English running cost, e.g. "17.4 km/l (₹5.2/km)".
+  realMileage           String?
 
-  /// One-line plain-English promise, e.g. "Families who put crash safety first".
+  /// One-line plain-English promise, e.g. "Highway trips in quiet comfort".
   bestForHeadline String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  variants Variant[]
-  colors   Color[]
-  images   VehicleImage[]
+  variants       Variant[]
+  localMedia     LocalMedia[]
+  colors         VehicleColor[]
+  reviewSections VehicleReview[]
 
   @@index([type, brand])
 }
 
 /// A purchasable trim. Prices are per-variant because that is how dealers quote.
 model Variant {
-  id        String  @id @default(cuid())
+  id        String  @id @default(uuid())
   vehicleId String
   vehicle   Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
 
@@ -95,9 +114,9 @@ model Variant {
 
   /// Null for electric vehicles, which have no engine displacement.
   engineCc        Int?
-  seatingCapacity Int
+  seatingCapacity Int      @default(5)
   /// Drives the "most bought" flag on the variant table.
-  isPopular       Boolean @default(false)
+  isPopular       Boolean  @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -106,44 +125,84 @@ model Variant {
   @@index([vehicleId, isPopular])
 }
 
-/// A paint option. `imaginStudioColorCode` maps our colour to the IMAGIN.studio
-/// CDN so the 360° viewer can render the right shade.
-model Color {
-  id        String  @id @default(cuid())
+/// Files we host ourselves under /uploads/vehicles or /vehicles.
+/// The 360 viewer and VDP gallery prefer these over any remote CDN.
+model LocalMedia {
+  id        String        @id @default(uuid())
+  vehicleId String
+  vehicle   Vehicle       @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  /// Public path, e.g. "/uploads/vehicles/hyundai-creta/hero.webp"
+  localPath String
+  category  MediaCategory
+  isHero    Boolean       @default(false)
+  caption   String?
+
+  createdAt DateTime @default(now())
+
+  @@index([vehicleId, category])
+}
+
+/// A paint option. `imaginColorCode` maps our colour to the IMAGIN.studio CDN
+/// so the 360° viewer can render the right shade.
+model VehicleColor {
+  id        String  @id @default(uuid())
   vehicleId String
   vehicle   Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
 
-  name                  String
-  hexCode               String
-  imaginStudioColorCode String?
+  name            String
+  hexCode         String
+  imaginColorCode String?
   /// The manufacturer's own paint name, which often differs from ours.
-  oemPaintName          String?
+  oemPaintName    String?
 
   @@unique([vehicleId, name])
 }
 
-model VehicleImage {
-  id        String  @id @default(cuid())
+/// Editorial review blocks stored per vehicle so the VDP is not hardcoded.
+model VehicleReview {
+  id        String  @id @default(uuid())
   vehicleId String
   vehicle   Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
 
-  url     String
-  type    ImageType
-  caption String?
+  /// "exterior" | "interior" | "features" | "safety" | "boot" | "performance"
+  sectionKey   String
+  title        String
+  shortSummary String
+  fullReview   String  @db.Text
+  imagePath    String?
 
-  @@index([vehicleId, type])
+  @@unique([vehicleId, sectionKey])
+}
+
+/// City-level road tax used by the live on-road engine.
+/// A more precise price-banded table (`RtoTaxRule`) still exists for states
+/// that publish slabs; the engine prefers a city row when one matches.
+model RtoTaxRate {
+  id          String      @id @default(uuid())
+  stateCode   String
+  city        String
+  vehicleType VehicleType
+  fuelType    FuelType
+  taxPercent  Decimal     @db.Decimal(5, 2)
+  /// Flat cess / smart-card fee, in paise.
+  fixedCess   Int         @default(0)
+
+  @@unique([stateCode, city, vehicleType, fuelType])
+  @@index([city, vehicleType, fuelType])
 }
 
 /// State-wise road tax, banded by ex-showroom price. The engine picks the row
-/// whose [priceMin, priceMax) window contains the variant price.
+/// whose [priceMin, priceMax) window contains the variant price when no city
+/// row in `RtoTaxRate` matches.
 model RtoTaxRule {
-  id        String      @id @default(cuid())
-  stateCode String
+  id          String      @id @default(uuid())
+  stateCode   String
   vehicleType VehicleType
   /// Null means the band applies to every fuel type in that state. A row with
   /// an explicit fuel type wins over a null row, which is how EV exemptions and
   /// CNG rebates are modelled without duplicating every band.
-  fuelType  FuelType?
+  fuelType    FuelType?
 
   /// Inclusive lower bound and exclusive upper bound, in paise.
   priceMin BigInt
@@ -162,7 +221,7 @@ model RtoTaxRule {
 
 /// Insurance is banded by engine displacement, per IRDAI's third-party tariff.
 model InsuranceRule {
-  id          String      @id @default(cuid())
+  id          String      @id @default(uuid())
   vehicleType VehicleType
 
   /// Displacement window in cc. EVs are matched on a 0-0 band.
@@ -171,11 +230,11 @@ model InsuranceRule {
 
   /// Statutory third-party premium for one year, in paise. The engine
   /// multiplies this by the bundled term (3 years for cars, 5 for bikes).
-  baseThirdParty1Yr BigInt
+  baseThirdParty1Yr   BigInt
   /// Own-damage premium as a percentage of ex-showroom price.
   ownDamagePercentage Decimal @db.Decimal(5, 3)
   /// Compulsory personal accident cover for the owner-driver, in paise.
-  mandatoryCpaFee   BigInt
+  mandatoryCpaFee     BigInt
 
   updatedAt DateTime @updatedAt
 

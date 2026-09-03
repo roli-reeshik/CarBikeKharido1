@@ -2,11 +2,11 @@
  * Picks the best photograph for a catalogue vehicle.
  *
  * Order (first hit wins):
- *   1. Live Wikimedia Commons, when it has a newer model-year than the bundle
- *   2. Bundled Wikimedia files in `public/vehicles/` (refreshed by `npm run fetch:photos`)
+ *   1. `getVehicleImage` curated HD map (local files, never a broken URL)
+ *   2. Live Wikimedia Commons, when it has a newer model-year than the bundle
  *   3. Catalogue / database image rows
  *   4. EVOX (licensed, North America — usually misses Indian models)
- *   5. IMAGIN.studio render, when a customer key is set
+ *   5. IMAGIN.studio render via generateImaginImageUrl
  *
  * API Ninjas has no images. RapidAPI is never consulted here.
  */
@@ -16,6 +16,7 @@ import { buildImaginUrl } from "@/lib/imaginStudio";
 import type { VehicleWithRelations } from "@/lib/catalogue/types";
 import type { CarPhoto, DataSource } from "@/lib/types";
 import { carPhotos } from "@/lib/vehiclePhotos.generated";
+import { generateImaginImageUrl, toCarPhotos } from "@/utils/getVehicleImage";
 
 export interface ResolvedVehicleMedia {
   photos: CarPhoto[];
@@ -27,17 +28,29 @@ const UA =
   "CarBikeKharido/1.0 (https://carbikekharido.com; rkrajesh.pgi@gmail.com)";
 
 function fromCatalogueImages(vehicle: VehicleWithRelations): CarPhoto[] {
-  return vehicle.images.map((image, index) => ({
-    src: image.url,
+  const rows =
+    vehicle.localMedia.length > 0
+      ? vehicle.localMedia.map((item) => ({
+          src: item.localPath,
+          caption: item.caption,
+        }))
+      : vehicle.images.map((image) => ({
+          src: image.url,
+          caption: image.caption,
+        }));
+
+  return rows.map((image, index) => ({
+    src: image.src,
     width: 1600,
     height: 900,
     title: image.caption ?? `${vehicle.name} ${index + 1}`,
     author: "Catalogue",
-    licence: image.url.startsWith("/vehicles/")
-      ? "See photo credit on the page"
-      : "Catalogue",
+    licence:
+      image.src.startsWith("/vehicles/") || image.src.startsWith("/uploads/")
+        ? "See photo credit on the page"
+        : "Catalogue",
     licenceUrl: "",
-    sourceUrl: image.url,
+    sourceUrl: image.src,
   }));
 }
 
@@ -128,14 +141,23 @@ async function searchCommons(vehicle: VehicleWithRelations): Promise<CarPhoto[]>
 }
 
 function imaginPhoto(vehicle: VehicleWithRelations): CarPhoto | null {
-  const paint = vehicle.colors[0]?.imaginStudioColorCode;
-  const src = buildImaginUrl({
-    make: vehicle.brand,
-    model: vehicle.name.replace(vehicle.brand, "").trim() || vehicle.name,
-    paintCode: paint,
-    transparent: false,
-    width: 1400,
-  });
+  const paint =
+    vehicle.colors[0]?.imaginColorCode ??
+    vehicle.colors[0]?.imaginStudioColorCode;
+  const make =
+    vehicle.imaginMake ?? vehicle.brand.toLowerCase().replace(/\s+/g, "-");
+  const model =
+    vehicle.imaginModel ??
+    vehicle.name.replace(vehicle.brand, "").trim() ??
+    vehicle.name;
+  const src =
+    buildImaginUrl({
+      make,
+      model,
+      paintCode: paint,
+      transparent: false,
+      width: 1400,
+    }) ?? generateImaginImageUrl(make, model, "23");
   if (!src) return null;
   return {
     src,
@@ -161,6 +183,20 @@ function maxPhotoYear(photos: CarPhoto[]): number {
 export async function resolveVehicleMedia(
   vehicle: VehicleWithRelations,
 ): Promise<ResolvedVehicleMedia> {
+  const curated = toCarPhotos({
+    slug: vehicle.slug,
+    brand: vehicle.brand,
+    make: vehicle.brand,
+    model: vehicle.name.replace(vehicle.brand, "").trim() || vehicle.name,
+  });
+  if (
+    curated.length > 0 &&
+    (curated[0].src.startsWith("/vehicles/") ||
+      curated[0].src.startsWith("/uploads/"))
+  ) {
+    return { photos: curated, source: "commons" };
+  }
+
   const bundled = carPhotos[vehicle.slug] ?? [];
   const live = await searchCommons(vehicle);
   const bundledYear = maxPhotoYear(bundled);

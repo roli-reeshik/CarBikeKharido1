@@ -1,61 +1,58 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, Bike, Car, Gauge, IndianRupee } from "lucide-react";
+import { ArrowRight, Bike, Car } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
 import { cn } from "@/lib/utils";
+import { getVehicleImage } from "@/utils/getVehicleImage";
 
 export type ShowcaseKind = "CAR" | "BIKE";
 
 const splitSpring = { type: "spring", stiffness: 200, damping: 25 } as const;
 
+const carPhoto = getVehicleImage("hyundai-creta");
+const bikePhoto = getVehicleImage("ducati-panigale-v4");
+
 const panels = {
   CAR: {
-    image: "/vehicles/hyundai-creta-1.png",
-    alt: "2024 Hyundai Creta, three-quarter front view",
-    badge: "Explore 4-Wheelers",
+    image: carPhoto.src,
+    alt: carPhoto.alt,
+    badge: "Cars",
     BadgeIcon: Car,
-    headline: "Find Your Perfect Car",
-    subtext:
-      "Family SUVs, City Automatics, EVs & Hatchbacks — tailored to your real budget.",
-    primary: "Search & Buy Cars",
-    secondary: "Filter by Budget / On-Road Price",
-    accent: "from-blue-500/25",
+    headline: "Browse every car",
+    subtext: "SUVs, automatics, family haulers — tap through to the full list.",
+    cta: "See all cars",
+    accent: "from-blue-500/30",
+    object: "object-[center_55%]",
   },
   BIKE: {
-    image: "/vehicles/royal-enfield-classic-350-1.jpg",
-    alt: "Royal Enfield Classic 350, three-quarter view",
-    badge: "Explore 2-Wheelers",
+    image: bikePhoto.src,
+    alt: bikePhoto.alt,
+    badge: "Two-wheelers",
     BadgeIcon: Bike,
-    headline: "Find Your Dream Bike",
-    subtext: "Daily Commuters, Tourers, Cruisers & Performance Superbikes.",
-    primary: "Search & Buy Bikes",
-    secondary: "Explore Superbikes & EV Scooters",
-    accent: "from-rose-500/25",
+    headline: "Browse every bike",
+    subtext: "Cruisers, commuters and EV scooters — priced the same honest way.",
+    cta: "See all two-wheelers",
+    accent: "from-rose-500/30",
+    object: "object-center",
   },
 } as const;
 
 interface HeroShowcaseProps {
-  onBrowseCatalog: (kind: ShowcaseKind) => void;
-  onOpenFinder: (kind: ShowcaseKind, preset?: "budget" | "superbike") => void;
+  onSelect: (kind: ShowcaseKind) => void;
 }
 
 /**
- * Full-bleed 50/50 car vs bike showcase. Width classes stay identical on the
- * server and the first client paint (`hovered` starts null). Hover then
- * springs the active half to 58% via Framer Motion layout.
+ * Full-bleed 50/50 car vs bike panels. The whole half is the hit target.
  */
-export function HeroShowcase({
-  onBrowseCatalog,
-  onOpenFinder,
-}: HeroShowcaseProps) {
+export function HeroShowcase({ onSelect }: HeroShowcaseProps) {
   const [hovered, setHovered] = useState<ShowcaseKind | null>(null);
 
   return (
     <div
-      className="relative isolate flex min-h-0 flex-col overflow-hidden bg-slate-950 lg:h-[min(86vh,880px)] lg:flex-row"
+      className="relative isolate flex min-h-0 flex-col overflow-hidden bg-slate-950 lg:h-[min(72vh,760px)] lg:flex-row"
       onMouseLeave={() => setHovered(null)}
     >
       <ShowcasePanel
@@ -63,15 +60,13 @@ export function HeroShowcase({
         hovered={hovered}
         divider
         onHover={setHovered}
-        onPrimary={() => onBrowseCatalog("CAR")}
-        onSecondary={() => onOpenFinder("CAR", "budget")}
+        onSelect={() => onSelect("CAR")}
       />
       <ShowcasePanel
         kind="BIKE"
         hovered={hovered}
         onHover={setHovered}
-        onPrimary={() => onBrowseCatalog("BIKE")}
-        onSecondary={() => onOpenFinder("BIKE", "superbike")}
+        onSelect={() => onSelect("BIKE")}
       />
     </div>
   );
@@ -82,28 +77,29 @@ function ShowcasePanel({
   hovered,
   divider,
   onHover,
-  onPrimary,
-  onSecondary,
+  onSelect,
 }: {
   kind: ShowcaseKind;
   hovered: ShowcaseKind | null;
   divider?: boolean;
   onHover: (kind: ShowcaseKind) => void;
-  onPrimary: () => void;
-  onSecondary: () => void;
+  onSelect: () => void;
 }) {
   const copy = panels[kind];
   const BadgeIcon = copy.BadgeIcon;
   const active = hovered === kind;
 
   return (
-    <motion.article
+    <motion.button
+      type="button"
       layout
       transition={splitSpring}
       onMouseEnter={() => onHover(kind)}
-      onFocusCapture={() => onHover(kind)}
+      onFocus={() => onHover(kind)}
+      onClick={onSelect}
+      aria-label={copy.cta}
       className={cn(
-        "relative isolate min-h-[400px] w-full overflow-hidden lg:h-full",
+        "group relative isolate min-h-[320px] w-full overflow-hidden text-left lg:h-full",
         !hovered && "lg:w-1/2",
         hovered === kind && "lg:w-[58%]",
         hovered && hovered !== kind && "lg:w-[42%]",
@@ -121,59 +117,39 @@ function ShowcasePanel({
           alt={copy.alt}
           fill
           priority
+          quality={90}
           sizes="(max-width: 1023px) 100vw, 58vw"
-          className="object-cover object-center"
+          className={cn("object-cover", copy.object)}
         />
       </motion.div>
 
       <div
         aria-hidden
         className={cn(
-          "absolute inset-0 bg-linear-to-t from-black/85 via-black/40 to-transparent",
+          "absolute inset-0 bg-linear-to-t from-black/80 via-black/35 to-black/10",
           copy.accent,
         )}
       />
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-linear-to-r from-black/35 via-transparent to-black/20"
-      />
 
-      <div className="relative z-10 flex h-full min-h-[400px] flex-col justify-end p-6 sm:p-8 lg:min-h-0 lg:p-10 xl:p-14">
-        <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold tracking-wide text-white/90 shadow-micro backdrop-blur-md">
+      <div className="relative z-10 flex h-full min-h-[320px] flex-col justify-end p-6 sm:p-8 lg:min-h-0 lg:p-10">
+        <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold tracking-wide text-white/90 backdrop-blur-md">
           <BadgeIcon className="size-3.5" aria-hidden />
           {copy.badge}
         </span>
-
-        <h2 className="mt-4 max-w-lg text-3xl font-semibold tracking-tight text-white sm:text-4xl xl:text-5xl">
+        <h2 className="mt-4 max-w-lg text-3xl font-semibold tracking-tight text-white sm:text-4xl">
           {copy.headline}
         </h2>
-        <p className="mt-3 max-w-md text-sm leading-relaxed text-white/75 sm:text-base">
+        <p className="mt-2 max-w-md text-sm leading-relaxed text-white/75 sm:text-base">
           {copy.subtext}
         </p>
-
-        <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
-          <button
-            type="button"
-            onClick={onPrimary}
-            className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 transition-colors hover:bg-slate-100"
-          >
-            {copy.primary}
-            <ArrowRight className="size-4" aria-hidden />
-          </button>
-          <button
-            type="button"
-            onClick={onSecondary}
-            className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-white/25 bg-white/10 px-4 py-2.5 text-sm font-medium text-white backdrop-blur-md transition-colors hover:border-white/40 hover:bg-white/15"
-          >
-            {kind === "CAR" ? (
-              <IndianRupee className="size-4" aria-hidden />
-            ) : (
-              <Gauge className="size-4" aria-hidden />
-            )}
-            {copy.secondary}
-          </button>
-        </div>
+        <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-white">
+          {copy.cta}
+          <ArrowRight
+            className="size-4 transition-transform group-hover:translate-x-0.5"
+            aria-hidden
+          />
+        </span>
       </div>
-    </motion.article>
+    </motion.button>
   );
 }

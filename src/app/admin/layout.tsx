@@ -12,6 +12,15 @@ export const metadata: Metadata = {
   title: "Admin",
   // Internal tooling must never appear in search results.
   robots: { index: false, follow: false },
+  authors: [{ name: siteConfig.developer.name }],
+  creator: siteConfig.developer.name,
+  publisher: siteConfig.owner,
+  other: {
+    copyright: siteConfig.copyright,
+    "contact:phone_number": siteConfig.contact.mobile,
+    "contact:email": siteConfig.contact.email,
+    "registered-address": siteConfig.address.full,
+  },
 };
 
 /**

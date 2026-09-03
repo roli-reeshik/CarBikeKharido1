@@ -152,7 +152,7 @@ function pickMatch(
   if (answers.occupants === "crowd") {
     reasons.push(`Seats ${headline.seatingCapacity}.`);
   } else {
-    reasons.push(luggagePlain(winner.luggageCapacityBags) + ".");
+    reasons.push(luggagePlain(winner.luggageCapacityBags, winner.bootSpaceLuggage) + ".");
   }
 
   if (answers.terrain === "city") {
@@ -353,7 +353,7 @@ export function GuidedMatcherModal({
                         <div className="grid grid-cols-2 gap-2 pt-1">
                           <span className="flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-2 text-xs text-slate-600 dark:bg-slate-800/60 dark:text-slate-300">
                             <Luggage className="size-3.5 shrink-0" aria-hidden />
-                            {luggagePlain(match.vehicle.luggageCapacityBags)}
+                            {luggagePlain(match.vehicle.luggageCapacityBags, match.vehicle.bootSpaceLuggage)}
                           </span>
                           <span className="flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-2 text-xs text-slate-600 dark:bg-slate-800/60 dark:text-slate-300">
                             <Fuel className="size-3.5 shrink-0" aria-hidden />

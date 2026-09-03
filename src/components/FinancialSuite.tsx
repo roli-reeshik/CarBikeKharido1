@@ -6,16 +6,18 @@ import { Wallet } from "lucide-react";
 import { EmiCalculatorWidget } from "@/components/EmiCalculatorWidget";
 import { OnRoadPriceWidget } from "@/components/OnRoadPriceWidget";
 import { useSelectedVehicle } from "@/components/providers/SelectedVehicleProvider";
-import type { InsuranceRule, RtoTaxRule, VehicleWithRelations } from "@/lib/catalogue/types";
+import type { InsuranceRule, RtoTaxRate, RtoTaxRule, VehicleWithRelations } from "@/lib/catalogue/types";
 import { cn } from "@/lib/utils";
 
 export function FinancialSuite({
   vehicles,
   rtoRules,
+  rtoRates,
   insuranceRules,
 }: {
   vehicles: VehicleWithRelations[];
   rtoRules: RtoTaxRule[];
+  rtoRates?: RtoTaxRate[];
   insuranceRules: InsuranceRule[];
 }) {
   const { slug, setSlug } = useSelectedVehicle();
@@ -78,8 +80,8 @@ export function FinancialSuite({
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <OnRoadPriceWidget rtoRules={rtoRules} insuranceRules={insuranceRules} />
-        <EmiCalculatorWidget rtoRules={rtoRules} insuranceRules={insuranceRules} />
+        <OnRoadPriceWidget rtoRules={rtoRules} rtoRates={rtoRates} insuranceRules={insuranceRules} />
+        <EmiCalculatorWidget rtoRules={rtoRules} rtoRates={rtoRates} insuranceRules={insuranceRules} />
       </div>
     </section>
   );

@@ -9,7 +9,7 @@ import { useSelectedVehicle } from "@/components/providers/SelectedVehicleProvid
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { serviceCities } from "@/lib/catalogue/seedData";
 import { headlineVariant } from "@/lib/catalogue/types";
-import type { InsuranceRule, RtoTaxRule } from "@/lib/catalogue/types";
+import type { InsuranceRule, RtoTaxRate, RtoTaxRule } from "@/lib/catalogue/types";
 import { formatPaise, paiseToRupees } from "@/lib/money";
 import { calculateOnRoadPrice } from "@/lib/pricingEngine";
 import { cn } from "@/lib/utils";
@@ -18,9 +18,11 @@ const quickCityIds = ["lucknow", "new-delhi", "mumbai", "bengaluru"];
 
 export function OnRoadPriceWidget({
   rtoRules,
+  rtoRates,
   insuranceRules,
 }: {
   rtoRules: RtoTaxRule[];
+  rtoRates?: RtoTaxRate[];
   insuranceRules: InsuranceRule[];
 }) {
   const { city, cityId, setCityId } = useCity();
@@ -39,9 +41,9 @@ export function OnRoadPriceWidget({
           stateCode: city.stateCode,
           cityName: city.name,
         },
-        { rtoRules, insuranceRules },
+        { rtoRules, rtoRates, insuranceRules },
       ),
-    [headline, vehicle.type, city, rtoRules, insuranceRules],
+    [headline, vehicle.type, city, rtoRules, rtoRates, insuranceRules],
   );
 
   const extras = quote.totalPaise - headline.exShowroomPricePence;

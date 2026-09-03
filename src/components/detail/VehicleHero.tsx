@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { ColourPicker } from "@/components/detail/ColourPicker";
 import { Vehicle360Viewer } from "@/components/Vehicle360Viewer";
-import { imaginModelName } from "@/lib/catalogue/copy";
+import { imaginMakeName, imaginModelName } from "@/lib/catalogue/copy";
 import type { VehicleWithRelations } from "@/lib/catalogue/types";
 import type { CarPhoto } from "@/lib/types";
 
@@ -27,9 +27,9 @@ export function VehicleHero({
     <div className="space-y-4">
       <Vehicle360Viewer
         key={colour?.id ?? "default"}
-        make={vehicle.brand}
+        make={imaginMakeName(vehicle)}
         model={imaginModelName(vehicle)}
-        paintCode={colour?.imaginStudioColorCode}
+        paintCode={colour?.imaginColorCode ?? colour?.imaginStudioColorCode}
         alt={vehicle.name}
         fallbackPhotos={photos}
       />

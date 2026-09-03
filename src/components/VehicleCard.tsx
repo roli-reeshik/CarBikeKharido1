@@ -162,7 +162,7 @@ export function VehicleCard({ vehicle, index = 0 }: VehicleCardProps) {
           <MetricChip
             icon={Luggage}
             label="Luggage"
-            value={luggagePlain(vehicle.luggageCapacityBags)}
+            value={luggagePlain(vehicle.luggageCapacityBags, vehicle.bootSpaceLuggage)}
           />
           <MetricChip
             icon={vehicle.isElectric ? Zap : Fuel}

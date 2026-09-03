@@ -69,7 +69,7 @@ function profile(vehicle: VehicleWithRelations) {
       score: headline.seatingCapacity * 14,
     },
     bootForTrips: {
-      verdict: luggagePlain(vehicle.luggageCapacityBags),
+      verdict: luggagePlain(vehicle.luggageCapacityBags, vehicle.bootSpaceLuggage),
       score: bags * 22,
     },
     safetyKit: {

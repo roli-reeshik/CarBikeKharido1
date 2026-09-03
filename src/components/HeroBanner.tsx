@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { ExplainTooltip } from "@/components/ExplainTooltip";
 import { requestCatalogLens } from "@/lib/catalogFocus";
 import { cn } from "@/lib/utils";
+import { getVehicleImage } from "@/utils/getVehicleImage";
 
 type Segment = "new" | "used" | "bikes";
 type FilterMode = "budget" | "brand";
@@ -26,7 +27,16 @@ const bodyTypes = [
   { id: "cng", label: "High-Mileage CNG" },
 ] as const;
 
-const brands = ["Tata", "Maruti Suzuki", "Hyundai", "Mahindra", "Royal Enfield", "TVS"] as const;
+const brands = [
+  "Tata",
+  "Maruti Suzuki",
+  "Hyundai",
+  "Mahindra",
+  "Royal Enfield",
+  "TVS",
+  "Ola",
+  "Ducati",
+] as const;
 
 const slides = [
   {
@@ -34,8 +44,8 @@ const slides = [
     badge: "COMPACT SUV",
     name: "Tata Nexon",
     headline: "A 5-star family SUV that still makes sense on a city fuel budget",
-    image: "/vehicles/tata-nexon-1.jpg",
-    alt: "Tata Nexon, three-quarter front view",
+    image: getVehicleImage("tata-nexon").src,
+    alt: getVehicleImage("tata-nexon").alt,
     lens: "cars" as const,
   },
   {
@@ -43,8 +53,8 @@ const slides = [
     badge: "MIDSIZE SUV",
     name: "Hyundai Creta",
     headline: "Highway trips in quiet comfort — every RTO rupee explained",
-    image: "/vehicles/hyundai-creta-1.png",
-    alt: "2024 Hyundai Creta, three-quarter front view",
+    image: getVehicleImage("hyundai-creta").src,
+    alt: getVehicleImage("hyundai-creta").alt,
     lens: "cars" as const,
   },
   {
@@ -52,8 +62,8 @@ const slides = [
     badge: "CRUISER FEATURED",
     name: "Royal Enfield Classic 350",
     headline: "Weekend rides you actually look forward to",
-    image: "/vehicles/royal-enfield-classic-350-1.jpg",
-    alt: "Royal Enfield Classic 350, three-quarter view",
+    image: getVehicleImage("royal-enfield-classic-350").src,
+    alt: getVehicleImage("royal-enfield-classic-350").alt,
     lens: "bikes" as const,
   },
 ];

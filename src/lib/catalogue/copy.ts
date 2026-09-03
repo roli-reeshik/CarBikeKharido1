@@ -15,15 +15,24 @@ const accents: Record<string, Accent> = {
   "maruti-fronx": "blue",
   "hyundai-creta": "indigo",
   "mahindra-xuv-3xo": "amber",
+  "mahindra-thar": "amber",
+  "tata-punch-ev": "violet",
+  "maruti-ertiga": "indigo",
   "royal-enfield-classic-350": "rose",
   "tvs-iqube": "violet",
+  "ola-s1": "blue",
+  "ducati-panigale-v4": "rose",
 };
 
 export function vehicleAccent(slug: string): Accent {
   return accents[slug] ?? "blue";
 }
 
-export function luggagePlain(bags: number | null): string {
+export function luggagePlain(
+  bags: number | null,
+  override?: string | null,
+): string {
+  if (override) return override;
   if (bags == null) return "Two-wheeler — no boot";
   return `Fits ${bags} large suitcase${bags === 1 ? "" : "s"}`;
 }
@@ -57,6 +66,7 @@ export function fuelLabel(fuel: FuelType): string {
 }
 
 export function runningPlain(vehicle: VehicleWithRelations): string {
+  if (vehicle.realMileage) return vehicle.realMileage;
   if (vehicle.isElectric) {
     return `About ${vehicle.realMileageKmPerLitre} km per unit`;
   }
@@ -75,8 +85,16 @@ export function trafficPlain(vehicle: VehicleWithRelations): string {
   return "You'll be shifting in traffic";
 }
 
+export function imaginMakeName(vehicle: VehicleWithRelations): string {
+  return vehicle.imaginMake ?? vehicle.brand.toLowerCase().replace(/\s+/g, "-");
+}
+
 export function imaginModelName(vehicle: VehicleWithRelations): string {
-  return vehicle.name.replace(vehicle.brand, "").trim() || vehicle.name;
+  return (
+    vehicle.imaginModel ||
+    vehicle.name.replace(vehicle.brand, "").trim() ||
+    vehicle.name
+  );
 }
 
 /** True when any variant in the line-up uses this fuel. */

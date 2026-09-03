@@ -174,7 +174,8 @@ export function Vehicle360Viewer({
       </div>
 
       <figcaption className="mt-2 text-[11px] text-slate-400">
-        360° renders by{" "}
+        360° studio spin on CarBikeKharido.com · © VidyaLabs. All Rights Reserved.
+        Renders by{" "}
         <a
           href="https://imagin.studio/"
           target="_blank"
@@ -183,6 +184,7 @@ export function Vehicle360Viewer({
         >
           IMAGIN.studio
         </a>
+        . Principal Developer: Rajesh Kumar.
       </figcaption>
     </figure>
   );

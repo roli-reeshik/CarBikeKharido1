@@ -17,7 +17,13 @@
  * number on this site without being able to find out what it is for.
  */
 import { percentOf, rupeesToPaise } from "./money";
-import type { FuelType, InsuranceRule, RtoTaxRule, VehicleType } from "./catalogue/types";
+import type {
+  FuelType,
+  InsuranceRule,
+  RtoTaxRate,
+  RtoTaxRule,
+  VehicleType,
+} from "./catalogue/types";
 
 /** FASTag is a windscreen toll tag, so it applies to cars and not to bikes. */
 export const FASTAG_PAISE = rupeesToPaise(500);
@@ -73,6 +79,8 @@ export interface OnRoadQuote {
 export interface PricingRules {
   rtoRules: RtoTaxRule[];
   insuranceRules: InsuranceRule[];
+  /** City-level rates. When a row matches, it wins over a state-wide band. */
+  rtoRates?: RtoTaxRate[];
 }
 
 /**
@@ -99,6 +107,33 @@ export function selectRtoRule(
   );
 }
 
+/**
+ * City-specific tax row. Fuel must match exactly — that is how Lucknow EV
+ * exemption and Mumbai petrol slabs stay on different rows.
+ */
+export function selectRtoRate(
+  rates: RtoTaxRate[] | undefined,
+  { stateCode, vehicleType, fuelType, cityName }: PricingInput,
+): RtoTaxRate | undefined {
+  if (!rates?.length || !cityName) return undefined;
+  const city = cityName.trim().toLowerCase();
+  return (
+    rates.find(
+      (rate) =>
+        rate.city.toLowerCase() === city &&
+        rate.vehicleType === vehicleType &&
+        rate.fuelType === fuelType,
+    ) ??
+    rates.find(
+      (rate) =>
+        rate.stateCode === stateCode &&
+        rate.city.toLowerCase() === city &&
+        rate.vehicleType === vehicleType &&
+        rate.fuelType === fuelType,
+    )
+  );
+}
+
 /** Matches the IRDAI displacement band. Electric vehicles use the 0cc band. */
 export function selectInsuranceRule(
   rules: InsuranceRule[],
@@ -112,6 +147,21 @@ export function selectInsuranceRule(
       cc >= rule.engineCcMin &&
       cc <= rule.engineCcMax,
   );
+}
+
+function describeCityTax(
+  rate: RtoTaxRate,
+  input: PricingInput,
+  isExempt: boolean,
+): string {
+  if (isExempt) {
+    return `${input.cityName ?? rate.city} charges no road tax on electric vehicles, so this line is zero. A petrol equivalent in the same city would pay ${rate.taxPercent === 0 ? "several percent" : `${rate.taxPercent}%`} of its ex-showroom price here.`;
+  }
+  const cess =
+    rate.fixedCess > 0
+      ? ` A flat cess of ₹${Math.round(rate.fixedCess / 100)} is added on top.`
+      : "";
+  return `A one-time tax paid to the ${rate.city} RTO (${rate.stateCode}), charged at ${rate.taxPercent}% of the ex-showroom price for ${rate.fuelType.toLowerCase()} ${rate.vehicleType === "CAR" ? "cars" : "two-wheelers"}.${cess} This is why the same vehicle costs different amounts in Lucknow and Bengaluru.`;
 }
 
 function describeRoadTax(
@@ -138,7 +188,7 @@ function describeRoadTax(
  */
 export function calculateOnRoadPrice(
   input: PricingInput,
-  { rtoRules, insuranceRules }: PricingRules,
+  { rtoRules, insuranceRules, rtoRates }: PricingRules,
 ): OnRoadQuote {
   const { exShowroomPaise, vehicleType, fuelType, engineCc } = input;
 
@@ -153,27 +203,35 @@ export function calculateOnRoadPrice(
   ];
 
   // --- Road tax -----------------------------------------------------------
-  const rule = selectRtoRule(rtoRules, input);
-  const isExempt = fuelType === "ELECTRIC" && (rule?.taxPercentage ?? 0) === 0;
+  const cityRate = selectRtoRate(rtoRates, input);
+  const rule = cityRate ? undefined : selectRtoRule(rtoRules, input);
+  const taxPercent = cityRate
+    ? Number(cityRate.taxPercent)
+    : rule
+      ? Number(rule.taxPercentage)
+      : 8;
+  const cessPercent = cityRate ? 0 : rule ? Number(rule.cessPercentage) : 0;
+  const fixedFee = cityRate ? cityRate.fixedCess : rule ? rule.fixedFee : 0;
+  const isExempt = fuelType === "ELECTRIC" && taxPercent === 0;
 
   // Falling back to a national average is better than refusing to quote, but
   // the caller is told so it can surface the caveat.
-  const usedFallbackTaxRule = !rule;
-  const taxPercent = rule ? Number(rule.taxPercentage) : 8;
-  const cessPercent = rule ? Number(rule.cessPercentage) : 0;
-  const fixedFee = rule ? rule.fixedFee : 0;
+  const usedFallbackTaxRule = !cityRate && !rule;
 
   const roadTax =
     percentOf(exShowroomPaise, taxPercent) +
     percentOf(exShowroomPaise, cessPercent) +
     fixedFee;
 
+  const taxLabelCity = input.cityName ? ` — ${input.cityName}` : "";
   lines.push({
     id: "roadTax",
-    label: `State road tax (${input.stateCode})`,
+    label: `State road tax (${input.stateCode}${taxLabelCity})`,
     amountPaise: roadTax,
-    explanation: describeRoadTax(rule, input, isExempt),
-    note: isExempt ? "Waived for electric vehicles in this state" : undefined,
+    explanation: cityRate
+      ? describeCityTax(cityRate, input, isExempt)
+      : describeRoadTax(rule, input, isExempt),
+    note: isExempt ? "Waived for electric vehicles in this city" : undefined,
   });
 
   // --- Insurance ----------------------------------------------------------

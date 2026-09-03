@@ -11,6 +11,7 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
+    "db:setup": "prisma generate && prisma db push && tsx prisma/seed.ts",
     "db:studio": "prisma studio",
     "fetch:photos": "node scripts/fetch-car-photos.mjs",
     "ingest:rapidapi": "tsx scripts/ingest-rapidapi.ts"

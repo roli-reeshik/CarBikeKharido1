@@ -8,6 +8,7 @@ import {
   entryVariant,
   priceRangePaise,
   type InsuranceRule,
+  type RtoTaxRate,
   type RtoTaxRule,
   type VehicleWithRelations,
 } from "@/lib/catalogue/types";
@@ -18,10 +19,12 @@ import { variantTags } from "@/lib/vdpContent";
 export function PriceHero({
   vehicle,
   rtoRules,
+  rtoRates,
   insuranceRules,
 }: {
   vehicle: VehicleWithRelations;
   rtoRules: RtoTaxRule[];
+  rtoRates?: RtoTaxRate[];
   insuranceRules: InsuranceRule[];
 }) {
   const { city } = useCity();
@@ -42,10 +45,10 @@ export function PriceHero({
           stateCode: city.stateCode,
           cityName: city.name,
         },
-        { rtoRules, insuranceRules },
+        { rtoRules, rtoRates, insuranceRules },
       ).totalPaise;
     return { from: quote(cheap), to: quote(top) };
-  }, [vehicle, city, rtoRules, insuranceRules]);
+  }, [vehicle, city, rtoRules, rtoRates, insuranceRules]);
 
   const tags = variantTags(vehicle);
 

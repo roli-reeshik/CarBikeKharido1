@@ -8,6 +8,7 @@ import { useCity } from "@/components/providers/CityProvider";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import type {
   InsuranceRule,
+  RtoTaxRate,
   RtoTaxRule,
   ServiceCity,
   Variant,
@@ -21,6 +22,7 @@ interface OnRoadQuoteProps {
   vehicle: VehicleWithRelations;
   cities: ServiceCity[];
   rtoRules: RtoTaxRule[];
+  rtoRates?: RtoTaxRate[];
   insuranceRules: InsuranceRule[];
   initialVariantId: string;
   initialCityId: string;
@@ -37,6 +39,7 @@ export function OnRoadQuote({
   vehicle,
   cities,
   rtoRules,
+  rtoRates,
   insuranceRules,
   initialVariantId,
   initialCityId,
@@ -63,9 +66,9 @@ export function OnRoadQuote({
           stateCode: city.stateCode,
           cityName: city.name,
         },
-        { rtoRules, insuranceRules },
+        { rtoRules, rtoRates, insuranceRules },
       ),
-    [variant, vehicle.type, city, rtoRules, insuranceRules],
+    [variant, vehicle.type, city, rtoRules, rtoRates, insuranceRules],
   );
 
   return (

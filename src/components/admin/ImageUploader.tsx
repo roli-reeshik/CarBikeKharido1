@@ -93,8 +93,8 @@ export function ImageUploader({
         </p>
       ) : (
         <p className="mt-1.5 text-xs text-slate-400">
-          Paste an OEM press-kit URL. Hosted files are not uploaded to this
-          server — we store the link.
+          Paste a local path such as /vehicles/creta-hero.webp or
+          /uploads/vehicles/hyundai-creta/hero.webp. Files stay on this server.
         </p>
       )}
     </form>

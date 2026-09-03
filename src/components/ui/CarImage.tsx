@@ -4,13 +4,13 @@ import Image from "next/image";
 import { useState } from "react";
 
 import { CarVisual } from "@/components/ui/CarVisual";
-import { carPhotos } from "@/lib/vehiclePhotos.generated";
 import type { Accent, CarPhoto } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { toCarPhotos } from "@/utils/getVehicleImage";
 
 /** Returns the photo set for a car, or an empty array when we have none. */
 export function photosFor(carId: string): CarPhoto[] {
-  return carPhotos[carId] ?? [];
+  return toCarPhotos(carId);
 }
 
 interface CarImageProps {

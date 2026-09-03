@@ -1,5 +1,7 @@
 /**
  * Seeds PostgreSQL from the canonical dataset in `src/lib/catalogue/seedData.ts`.
+ * CarBikeKharido.com · © VidyaLabs. All Rights Reserved.
+ * Principal Developer: Rajesh Kumar
  *
  * Idempotent: every write is an upsert keyed on a stable id, so running it
  * repeatedly converges on the same state rather than duplicating rows. That
@@ -13,14 +15,20 @@ import "dotenv/config";
 
 import {
   insuranceRules,
+  rtoTaxRates,
   rtoTaxRules,
   vehicles,
 } from "../src/lib/catalogue/seedData";
+import { toCarPhotos } from "../src/utils/getVehicleImage";
+import { getReviewSections } from "../src/lib/vdpContent";
 
 const connectionString = process.env.DATABASE_URL?.trim();
 if (!connectionString) {
   console.error(
-    "DATABASE_URL is not set. Copy .env.example to .env and point it at a PostgreSQL instance.",
+    "DATABASE_URL is not set. Copy .env.example to .env and point it at PostgreSQL:",
+  );
+  console.error(
+    '  DATABASE_URL="postgresql://postgres:password@localhost:5432/carbikekharido?schema=public"',
   );
   process.exit(1);
 }
@@ -31,9 +39,17 @@ const prisma = new PrismaClient({
 
 async function main() {
   console.log("Seeding CarBikeKharido.com catalogue…");
+  console.log("© VidyaLabs. All Rights Reserved. · Rajesh Kumar");
 
   for (const vehicle of vehicles) {
-    const { variants, colors, images, ...fields } = vehicle;
+    const {
+      variants,
+      colors,
+      localMedia,
+      reviewSections: _seedReviews,
+      images: _images,
+      ...fields
+    } = vehicle;
 
     await prisma.vehicle.upsert({
       where: { id: vehicle.id },
@@ -54,22 +70,44 @@ async function main() {
     }
 
     for (const color of colors) {
-      await prisma.color.upsert({
+      const { imaginStudioColorCode: _alias, ...colorFields } = color;
+      await prisma.vehicleColor.upsert({
         where: { id: color.id },
-        create: color,
-        update: color,
+        create: colorFields,
+        update: colorFields,
       });
     }
 
-    for (const image of images) {
-      await prisma.vehicleImage.upsert({
-        where: { id: image.id },
-        create: image,
-        update: image,
+    for (const media of localMedia) {
+      await prisma.localMedia.upsert({
+        where: { id: media.id },
+        create: media,
+        update: media,
       });
     }
 
-    console.log(`  ${vehicle.name} — ${variants.length} variants, ${colors.length} colours`);
+    const photos = toCarPhotos(vehicle.slug);
+    const reviews = getReviewSections(vehicle, photos);
+    for (const section of reviews) {
+      const data = {
+        id: `rev-${vehicle.slug}-${section.id}`,
+        vehicleId: vehicle.id,
+        sectionKey: section.id,
+        title: section.heading,
+        shortSummary: section.shortDescription,
+        fullReview: section.fullDescription,
+        imagePath: section.imageUrl ?? null,
+      };
+      await prisma.vehicleReview.upsert({
+        where: { id: data.id },
+        create: data,
+        update: data,
+      });
+    }
+
+    console.log(
+      `  ${vehicle.name} — ${variants.length} variants, ${colors.length} colours, ${localMedia.length} local files, ${reviews.length} reviews`,
+    );
   }
 
   for (const rule of rtoTaxRules) {
@@ -87,6 +125,15 @@ async function main() {
   }
   console.log(`  ${rtoTaxRules.length} road tax bands`);
 
+  for (const rate of rtoTaxRates) {
+    await prisma.rtoTaxRate.upsert({
+      where: { id: rate.id },
+      create: rate,
+      update: rate,
+    });
+  }
+  console.log(`  ${rtoTaxRates.length} city tax rates`);
+
   for (const rule of insuranceRules) {
     const data = {
       ...rule,
@@ -101,7 +148,7 @@ async function main() {
   }
   console.log(`  ${insuranceRules.length} insurance bands`);
 
-  console.log("Done.");
+  console.log("Done. CarBikeKharido.com catalogue is live on PostgreSQL.");
 }
 
 main()

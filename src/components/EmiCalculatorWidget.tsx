@@ -9,7 +9,7 @@ import { useSelectedVehicle } from "@/components/providers/SelectedVehicleProvid
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { RangeSlider } from "@/components/ui/RangeSlider";
 import { headlineVariant } from "@/lib/catalogue/types";
-import type { InsuranceRule, RtoTaxRule } from "@/lib/catalogue/types";
+import type { InsuranceRule, RtoTaxRate, RtoTaxRule } from "@/lib/catalogue/types";
 import { calculateEmi, formatCompactRupees, formatRupees } from "@/lib/finance";
 import { paiseToRupees } from "@/lib/money";
 import { calculateOnRoadPrice } from "@/lib/pricingEngine";
@@ -54,9 +54,11 @@ function SplitRing({ principalShare }: { principalShare: number }) {
 
 export function EmiCalculatorWidget({
   rtoRules,
+  rtoRates,
   insuranceRules,
 }: {
   rtoRules: RtoTaxRule[];
+  rtoRates?: RtoTaxRate[];
   insuranceRules: InsuranceRule[];
 }) {
   const { city } = useCity();
@@ -73,10 +75,10 @@ export function EmiCalculatorWidget({
         stateCode: city.stateCode,
         cityName: city.name,
       },
-      { rtoRules, insuranceRules },
+      { rtoRules, rtoRates, insuranceRules },
     );
     return paiseToRupees(quote.totalPaise);
-  }, [headline, vehicle.type, city, rtoRules, insuranceRules]);
+  }, [headline, vehicle.type, city, rtoRules, rtoRates, insuranceRules]);
 
   const maxLoan = Math.ceil(onRoad / LOAN_STEP) * LOAN_STEP;
   const suggestedLoan = clamp(

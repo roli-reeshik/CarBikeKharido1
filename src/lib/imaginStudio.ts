@@ -28,7 +28,9 @@ const BASE_URL =
  * round-tripping to the server for each frame would make the spin stutter.
  * IMAGIN keys are domain-locked on their side, which is what protects them.
  */
-const customerKey = process.env.NEXT_PUBLIC_IMAGIN_CUSTOMER_KEY?.trim();
+const customerKey =
+  process.env.NEXT_PUBLIC_IMAGIN_CUSTOMER_KEY?.trim() ||
+  process.env.NEXT_PUBLIC_IMAGIN_API_KEY?.trim();
 
 export const isImaginEnabled = (): boolean => Boolean(customerKey);
 

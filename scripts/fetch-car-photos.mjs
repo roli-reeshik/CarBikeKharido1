@@ -110,6 +110,34 @@ const plans = [
     avoid: ["xuv400", "xuv 400", "xuv700", "xuv 700"],
     want: 3,
   },
+  {
+    id: "mahindra-thar",
+    queries: ["Mahindra Thar ROXX", "Mahindra Thar 2024", "Mahindra Thar"],
+    require: ["thar"],
+    prefer: ["roxx", "2024", "2025", "dirt"],
+    avoid: ["people of", "shri ajoba", "cropped"],
+    pin: [
+      "Mahindra Thar ROXX on dirt.jpg",
+      "Mahindra Thar ROXX on rocks.jpg",
+    ],
+    want: 2,
+  },
+  {
+    id: "tata-punch-ev",
+    queries: ["Tata Punch EV", "Tata Punch.ev", "Tata Punch electric"],
+    require: ["punch"],
+    prefer: ["ev", "2024", "2025"],
+    avoid: ["nexon", "harrier", "safari"],
+    want: 3,
+  },
+  {
+    id: "maruti-ertiga",
+    queries: ["Maruti Suzuki Ertiga", "Suzuki Ertiga 2023", "Suzuki Ertiga India"],
+    require: ["ertiga"],
+    prefer: ["2023", "2024", "2025", "india"],
+    avoid: ["xl6", "invicto", "rumion"],
+    want: 3,
+  },
   // --- Two-wheelers -------------------------------------------------------
   {
     id: "royal-enfield-classic-350",
@@ -153,6 +181,29 @@ const plans = [
     prefer: ["tvs", "electric", "2022", "2023", "2024"],
     avoid: ["concept", "m1-s"],
     want: 3,
+  },
+  {
+    id: "ola-s1",
+    queries: ["Ola S1 Pro", "Ola S1 Blue", "Ola Electric S1"],
+    require: ["s1"],
+    prefer: ["pro", "blue", "2024", "2025"],
+    avoid: ["interior"],
+    pin: ["Ola S1 Pro.jpg", "Ola S1 Blue.jpg"],
+    want: 2,
+  },
+  {
+    id: "ducati-panigale-v4",
+    queries: [
+      "Ducati Panigale V4 R",
+      "Ducati Panigale V4S 2025",
+      "Ducati Panigale V4 2026",
+      "Ducati Panigale V4",
+    ],
+    require: ["panigale"],
+    prefer: ["v4", "2025", "2026", "red"],
+    avoid: ["superleggera", "bodensee"],
+    pin: ["Ducati Panigale V4 R (3).jpg", "Ducati Panigale V4S 2025.jpg"],
+    want: 2,
   },
 ];
 

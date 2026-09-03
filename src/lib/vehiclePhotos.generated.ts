@@ -133,6 +133,28 @@ export const carPhotos: Record<string, CarPhoto[]> = {
       "sourceUrl": "https://commons.wikimedia.org/wiki/File:Mahindra_XUV_3XO_2025.jpg"
     }
   ],
+  "mahindra-thar": [
+    {
+      "src": "/vehicles/mahindra-thar-1.jpg",
+      "width": 1600,
+      "height": 900,
+      "title": "Mahindra Thar ROXX on dirt.jpg",
+      "author": "The Drivers Hub",
+      "licence": "CC BY 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Mahindra_Thar_ROXX_on_dirt.jpg"
+    },
+    {
+      "src": "/vehicles/mahindra-thar-2.jpg",
+      "width": 1600,
+      "height": 900,
+      "title": "Mahindra Thar ROXX on rocks.jpg",
+      "author": "The Drivers Hub",
+      "licence": "CC BY 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Mahindra_Thar_ROXX_on_rocks.jpg"
+    }
+  ],
   "royal-enfield-classic-350": [
     {
       "src": "/vehicles/royal-enfield-classic-350-1.jpg",
@@ -175,6 +197,114 @@ export const carPhotos: Record<string, CarPhoto[]> = {
       "licence": "CC BY-SA 4.0",
       "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
       "sourceUrl": "https://commons.wikimedia.org/wiki/File:Tvs_i_qube.jpg"
+    }
+  ],
+  "ola-s1": [
+    {
+      "src": "/vehicles/ola-s1-1.jpg",
+      "width": 1600,
+      "height": 1200,
+      "title": "Ola S1 Pro.jpg",
+      "author": "Ganesh Mohan T",
+      "licence": "CC BY-SA 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ola_S1_Pro.jpg"
+    },
+    {
+      "src": "/vehicles/ola-s1-2.jpg",
+      "width": 1600,
+      "height": 1200,
+      "title": "Ola S1 Blue.jpg",
+      "author": "Ganesh Mohan T",
+      "licence": "CC BY-SA 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ola_S1_Blue.jpg"
+    }
+  ],
+  "ducati-panigale-v4": [
+    {
+      "src": "/vehicles/ducati-panigale-v4-1.jpg",
+      "width": 1600,
+      "height": 1007,
+      "title": "Ducati Panigale V4 R (3).jpg",
+      "author": "Cjp24",
+      "licence": "CC BY-SA 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ducati_Panigale_V4_R_(3).jpg"
+    },
+    {
+      "src": "/vehicles/ducati-panigale-v4-2.jpg",
+      "width": 1600,
+      "height": 1338,
+      "title": "Ducati Panigale V4S 2025.jpg",
+      "author": "AVMOTO",
+      "licence": "CC BY-SA 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Ducati_Panigale_V4S_2025.jpg"
+    }
+  ],
+  "tata-punch-ev": [
+    {
+      "src": "/vehicles/tata-punch-ev-1.png",
+      "width": 1600,
+      "height": 900,
+      "title": "Tata Punch EV — front three-quarter",
+      "author": "CarBikeKharido.com catalogue",
+      "licence": "See photo credit on the page",
+      "licenceUrl": "",
+      "sourceUrl": "/vehicles/tata-punch-ev-1.png"
+    },
+    {
+      "src": "/vehicles/tata-punch-ev-2.png",
+      "width": 1600,
+      "height": 900,
+      "title": "Tata Punch EV — studio angle",
+      "author": "CarBikeKharido.com catalogue",
+      "licence": "See photo credit on the page",
+      "licenceUrl": "",
+      "sourceUrl": "/vehicles/tata-punch-ev-2.png"
+    },
+    {
+      "src": "/vehicles/tata-punch-ev-3.jpg",
+      "width": 1600,
+      "height": 900,
+      "title": "Tata Punch EV — side profile",
+      "author": "CarBikeKharido.com catalogue",
+      "licence": "See photo credit on the page",
+      "licenceUrl": "",
+      "sourceUrl": "/vehicles/tata-punch-ev-3.jpg"
+    }
+  ],
+  "maruti-ertiga": [
+    {
+      "src": "/vehicles/maruti-ertiga-1.jpg",
+      "width": 1600,
+      "height": 900,
+      "title": "Maruti Suzuki Ertiga — front three-quarter",
+      "author": "CarBikeKharido.com catalogue",
+      "licence": "See photo credit on the page",
+      "licenceUrl": "",
+      "sourceUrl": "/vehicles/maruti-ertiga-1.jpg"
+    },
+    {
+      "src": "/vehicles/maruti-ertiga-2.jpg",
+      "width": 1600,
+      "height": 900,
+      "title": "Maruti Suzuki Ertiga — rear three-quarter",
+      "author": "CarBikeKharido.com catalogue",
+      "licence": "See photo credit on the page",
+      "licenceUrl": "",
+      "sourceUrl": "/vehicles/maruti-ertiga-2.jpg"
+    },
+    {
+      "src": "/vehicles/maruti-ertiga-3.jpg",
+      "width": 1600,
+      "height": 900,
+      "title": "Maruti Suzuki Ertiga — side profile",
+      "author": "CarBikeKharido.com catalogue",
+      "licence": "See photo credit on the page",
+      "licenceUrl": "",
+      "sourceUrl": "/vehicles/maruti-ertiga-3.jpg"
     }
   ]
 };

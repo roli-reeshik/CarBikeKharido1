@@ -8,7 +8,7 @@
  * Every resolved record carries the `source` it came from so the UI can label
  * provenance honestly instead of implying sample numbers are live.
  */
-import { carPhotos } from "../vehiclePhotos.generated";
+import { toCarPhotos } from "@/utils/getVehicleImage";
 import { carDetails } from "../carDetails";
 import type { Car, CarDetail, CarPhoto, DataSource } from "../types";
 import { fetchEvoxPhotos } from "./evox";
@@ -36,7 +36,7 @@ export async function resolvePhotos(car: Car): Promise<ResolvedPhotos> {
   });
   if (evox.length > 0) return { photos: evox, source: "evox" };
 
-  const local = carPhotos[car.id] ?? [];
+  const local = toCarPhotos(car.id);
   if (local.length > 0) return { photos: local, source: "commons" };
 
   return { photos: [], source: "sample" };

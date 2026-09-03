@@ -12,12 +12,16 @@
  */
 import { rupeesToPaise as inr } from "../money";
 import type {
+  FuelType,
   InsuranceRule,
+  RtoTaxRate,
   RtoTaxRule,
   ServiceCity,
   VehicleImage,
+  VehicleType,
   VehicleWithRelations,
 } from "./types";
+import { imageTypeToCategory, imagesFromLocalMedia } from "./types";
 
 export const serviceCities: ServiceCity[] = [
   { id: "lucknow", name: "Lucknow", stateCode: "UP", stateName: "Uttar Pradesh", rto: "UP-32" },
@@ -49,7 +53,94 @@ function kit(vehicleId: string, slug: string, files: string[]): VehicleImage[] {
 // Vehicles
 // ---------------------------------------------------------------------------
 
-export const vehicles: VehicleWithRelations[] = [
+const IMAGIN_TOKENS: Record<string, { make: string; model: string }> = {
+  "tata-nexon": { make: "tata", model: "nexon" },
+  "maruti-fronx": { make: "suzuki", model: "fronx" },
+  "hyundai-creta": { make: "hyundai", model: "creta" },
+  "mahindra-xuv-3xo": { make: "mahindra", model: "xuv300" },
+  "mahindra-thar": { make: "mahindra", model: "thar" },
+  "tata-punch-ev": { make: "tata", model: "punch" },
+  "maruti-ertiga": { make: "suzuki", model: "ertiga" },
+  "royal-enfield-classic-350": { make: "royal-enfield", model: "classic" },
+  "tvs-iqube": { make: "tvs", model: "iqube" },
+  "ola-s1": { make: "ola", model: "s1" },
+  "ducati-panigale-v4": { make: "ducati", model: "panigale" },
+};
+
+function realMileageLine(
+  type: VehicleType,
+  isElectric: boolean,
+  km: number,
+): string {
+  if (isElectric) {
+    const paisePerKm = type === "BIKE" ? 25 : 80;
+    return `${km.toFixed(1)} km/unit (₹${(paisePerKm / 100).toFixed(2)}/km)`;
+  }
+  const rupeesPerLitre = type === "BIKE" ? 105 : 102;
+  const perKm = rupeesPerLitre / km;
+  return `${km.toFixed(1)} km/l (₹${perKm.toFixed(1)}/km)`;
+}
+
+type RawColor = {
+  id: string;
+  vehicleId: string;
+  name: string;
+  hexCode: string;
+  imaginStudioColorCode: string | null;
+  oemPaintName: string | null;
+};
+
+type RawVehicle = Omit<
+  VehicleWithRelations,
+  | "imaginMake"
+  | "imaginModel"
+  | "bootSpaceLuggage"
+  | "realMileage"
+  | "localMedia"
+  | "reviewSections"
+  | "colors"
+> & { colors: RawColor[] };
+
+function finaliseVehicle(raw: RawVehicle): VehicleWithRelations {
+  const tokens = IMAGIN_TOKENS[raw.slug] ?? {
+    make: raw.brand.toLowerCase().replace(/\s+/g, "-"),
+    model: raw.name.replace(raw.brand, "").trim().toLowerCase().replace(/\s+/g, "-"),
+  };
+  const colors = raw.colors.map((color) => ({
+    ...color,
+    imaginColorCode: color.imaginStudioColorCode,
+    imaginStudioColorCode: color.imaginStudioColorCode,
+  }));
+  const localMedia = raw.images.map((image, index) => ({
+    id: image.id.replace(/^img-/, "media-"),
+    vehicleId: image.vehicleId,
+    localPath: image.url,
+    category: imageTypeToCategory(image.type),
+    isHero: index === 0,
+    caption: image.caption,
+  }));
+
+  return {
+    ...raw,
+    imaginMake: tokens.make,
+    imaginModel: tokens.model,
+    bootSpaceLuggage:
+      raw.luggageCapacityBags == null
+        ? null
+        : `Fits ${raw.luggageCapacityBags} Large Suitcases`,
+    realMileage: realMileageLine(
+      raw.type,
+      raw.isElectric,
+      raw.realMileageKmPerLitre,
+    ),
+    colors,
+    localMedia,
+    reviewSections: [],
+    images: imagesFromLocalMedia(localMedia),
+  };
+}
+
+const rawVehicles: RawVehicle[] = [
   {
     id: "veh-tata-nexon",
     slug: "tata-nexon",
@@ -170,6 +261,95 @@ export const vehicles: VehicleWithRelations[] = [
       "mahindra-xuv-3xo-3.jpg",
     ]),
   },
+  {
+    id: "veh-mahindra-thar",
+    slug: "mahindra-thar",
+    name: "Mahindra Thar ROXX",
+    type: "CAR",
+    brand: "Mahindra",
+    bodyType: "Off-road SUV",
+    safetyRatingNCAP: 5,
+    isElectric: false,
+    luggageCapacityBags: 3,
+    realMileageKmPerLitre: 11.0,
+    bestForHeadline: "Weekends off the tarmac without giving up a proper cabin",
+    variants: [
+      { id: "var-thar-mx1", vehicleId: "veh-mahindra-thar", name: "MX1 Petrol", fuelType: "PETROL", transmissionType: "MANUAL", exShowroomPricePence: inr(12_99_000), engineCc: 1997, seatingCapacity: 5, isPopular: false },
+      { id: "var-thar-ax5", vehicleId: "veh-mahindra-thar", name: "AX5 Petrol", fuelType: "PETROL", transmissionType: "MANUAL", exShowroomPricePence: inr(15_49_000), engineCc: 1997, seatingCapacity: 5, isPopular: false },
+      { id: "var-thar-ax7l", vehicleId: "veh-mahindra-thar", name: "AX7 L Diesel Automatic", fuelType: "DIESEL", transmissionType: "AUTO_TORQUE_CONVERTER", exShowroomPricePence: inr(18_99_000), engineCc: 2184, seatingCapacity: 5, isPopular: true },
+      { id: "var-thar-ax7l-4wd", vehicleId: "veh-mahindra-thar", name: "AX7 L Diesel 4WD Automatic", fuelType: "DIESEL", transmissionType: "AUTO_TORQUE_CONVERTER", exShowroomPricePence: inr(21_49_000), engineCc: 2184, seatingCapacity: 5, isPopular: false },
+    ],
+    colors: [
+      { id: "col-thar-white", vehicleId: "veh-mahindra-thar", name: "Everest White", hexCode: "#f3f5f6", imaginStudioColorCode: "white", oemPaintName: "Everest White" },
+      { id: "col-thar-black", vehicleId: "veh-mahindra-thar", name: "Napoli Black", hexCode: "#14161a", imaginStudioColorCode: "black", oemPaintName: "Napoli Black" },
+      { id: "col-thar-red", vehicleId: "veh-mahindra-thar", name: "Deep Forest", hexCode: "#3d4a38", imaginStudioColorCode: "green", oemPaintName: "Deep Forest" },
+      { id: "col-thar-stealth", vehicleId: "veh-mahindra-thar", name: "Stealth Black", hexCode: "#2a2c2e", imaginStudioColorCode: "black", oemPaintName: "Stealth Black" },
+    ],
+    images: kit("veh-mahindra-thar", "mahindra-thar", [
+      "mahindra-thar-1.jpg",
+      "mahindra-thar-2.jpg",
+    ]),
+  },
+  {
+    id: "veh-tata-punch-ev",
+    slug: "tata-punch-ev",
+    name: "Tata Punch EV",
+    type: "CAR",
+    brand: "Tata",
+    bodyType: "Electric SUV",
+    safetyRatingNCAP: 5,
+    isElectric: true,
+    luggageCapacityBags: 3,
+    realMileageKmPerLitre: 8.5,
+    bestForHeadline: "City owners who can charge at home overnight",
+    variants: [
+      { id: "var-punch-smart", vehicleId: "veh-tata-punch-ev", name: "Smart", fuelType: "ELECTRIC", transmissionType: "EV", exShowroomPricePence: inr(10_00_000), engineCc: null, seatingCapacity: 5, isPopular: false },
+      { id: "var-punch-adventure", vehicleId: "veh-tata-punch-ev", name: "Adventure", fuelType: "ELECTRIC", transmissionType: "EV", exShowroomPricePence: inr(11_50_000), engineCc: null, seatingCapacity: 5, isPopular: false },
+      { id: "var-punch-empowered", vehicleId: "veh-tata-punch-ev", name: "Empowered Long Range", fuelType: "ELECTRIC", transmissionType: "EV", exShowroomPricePence: inr(12_50_000), engineCc: null, seatingCapacity: 5, isPopular: true },
+      { id: "var-punch-empowered-plus", vehicleId: "veh-tata-punch-ev", name: "Empowered+ Long Range", fuelType: "ELECTRIC", transmissionType: "EV", exShowroomPricePence: inr(13_20_000), engineCc: null, seatingCapacity: 5, isPopular: false },
+    ],
+    colors: [
+      { id: "col-punch-oxide", vehicleId: "veh-tata-punch-ev", name: "Empowered Oxide", hexCode: "#8a6a44", imaginStudioColorCode: "brown", oemPaintName: "Empowered Oxide" },
+      { id: "col-punch-white", vehicleId: "veh-tata-punch-ev", name: "Pristine White", hexCode: "#f2f4f5", imaginStudioColorCode: "white", oemPaintName: "Pristine White" },
+      { id: "col-punch-grey", vehicleId: "veh-tata-punch-ev", name: "Daytona Grey", hexCode: "#5f646a", imaginStudioColorCode: "grey", oemPaintName: "Daytona Grey" },
+      { id: "col-punch-red", vehicleId: "veh-tata-punch-ev", name: "Fearless Red", hexCode: "#a81f2b", imaginStudioColorCode: "red", oemPaintName: "Fearless Red" },
+    ],
+    images: kit("veh-tata-punch-ev", "tata-punch-ev", [
+      "tata-punch-ev-1.png",
+      "tata-punch-ev-2.png",
+      "tata-punch-ev-3.jpg",
+    ]),
+  },
+  {
+    id: "veh-maruti-ertiga",
+    slug: "maruti-ertiga",
+    name: "Maruti Suzuki Ertiga",
+    type: "CAR",
+    brand: "Maruti Suzuki",
+    bodyType: "7-Seater MPV",
+    safetyRatingNCAP: 3,
+    isElectric: false,
+    luggageCapacityBags: 2,
+    realMileageKmPerLitre: 22.0,
+    bestForHeadline: "Seven people and a small monthly fuel bill",
+    variants: [
+      { id: "var-ertiga-lxi", vehicleId: "veh-maruti-ertiga", name: "LXi", fuelType: "PETROL", transmissionType: "MANUAL", exShowroomPricePence: inr(8_80_000), engineCc: 1462, seatingCapacity: 7, isPopular: false },
+      { id: "var-ertiga-vxi-cng", vehicleId: "veh-maruti-ertiga", name: "VXi CNG", fuelType: "CNG", transmissionType: "MANUAL", exShowroomPricePence: inr(10_70_000), engineCc: 1462, seatingCapacity: 7, isPopular: true },
+      { id: "var-ertiga-zxi", vehicleId: "veh-maruti-ertiga", name: "ZXi+", fuelType: "PETROL", transmissionType: "MANUAL", exShowroomPricePence: inr(12_20_000), engineCc: 1462, seatingCapacity: 7, isPopular: false },
+      { id: "var-ertiga-zxi-cng", vehicleId: "veh-maruti-ertiga", name: "ZXi+ CNG", fuelType: "CNG", transmissionType: "MANUAL", exShowroomPricePence: inr(12_90_000), engineCc: 1462, seatingCapacity: 7, isPopular: false },
+    ],
+    colors: [
+      { id: "col-ertiga-white", vehicleId: "veh-maruti-ertiga", name: "Pearl Arctic White", hexCode: "#f3f5f6", imaginStudioColorCode: "white", oemPaintName: "Pearl Arctic White" },
+      { id: "col-ertiga-silver", vehicleId: "veh-maruti-ertiga", name: "Splendid Silver", hexCode: "#b4b9be", imaginStudioColorCode: "silver", oemPaintName: "Splendid Silver" },
+      { id: "col-ertiga-grey", vehicleId: "veh-maruti-ertiga", name: "Magma Grey", hexCode: "#5d6268", imaginStudioColorCode: "grey", oemPaintName: "Magma Grey" },
+      { id: "col-ertiga-red", vehicleId: "veh-maruti-ertiga", name: "Auburn Red", hexCode: "#8c2b2f", imaginStudioColorCode: "red", oemPaintName: "Auburn Red" },
+    ],
+    images: kit("veh-maruti-ertiga", "maruti-ertiga", [
+      "maruti-ertiga-1.jpg",
+      "maruti-ertiga-2.jpg",
+      "maruti-ertiga-3.jpg",
+    ]),
+  },
 
   // --- Two-wheelers -------------------------------------------------------
   {
@@ -230,7 +410,61 @@ export const vehicles: VehicleWithRelations[] = [
     ],
     images: kit("veh-tvs-iqube", "tvs-iqube", ["tvs-iqube-1.jpg"]),
   },
+  {
+    id: "veh-ola-s1",
+    slug: "ola-s1",
+    name: "Ola S1",
+    type: "BIKE",
+    brand: "Ola",
+    bodyType: "Electric Scooter",
+    safetyRatingNCAP: null,
+    isElectric: true,
+    luggageCapacityBags: null,
+    realMileageKmPerLitre: 28.0,
+    bestForHeadline: "A city scooter you charge at home, not at a pump",
+    variants: [
+      { id: "var-ola-s1x", vehicleId: "veh-ola-s1", name: "S1 X", fuelType: "ELECTRIC", transmissionType: "EV", exShowroomPricePence: inr(80_000), engineCc: null, seatingCapacity: 2, isPopular: false },
+      { id: "var-ola-s1-air", vehicleId: "veh-ola-s1", name: "S1 Air", fuelType: "ELECTRIC", transmissionType: "EV", exShowroomPricePence: inr(90_000), engineCc: null, seatingCapacity: 2, isPopular: false },
+      { id: "var-ola-s1-pro", vehicleId: "veh-ola-s1", name: "S1 Pro", fuelType: "ELECTRIC", transmissionType: "EV", exShowroomPricePence: inr(1_15_000), engineCc: null, seatingCapacity: 2, isPopular: true },
+      { id: "var-ola-s1-pro-plus", vehicleId: "veh-ola-s1", name: "S1 Pro+", fuelType: "ELECTRIC", transmissionType: "EV", exShowroomPricePence: inr(1_40_000), engineCc: null, seatingCapacity: 2, isPopular: false },
+    ],
+    colors: [
+      { id: "col-ola-white", vehicleId: "veh-ola-s1", name: "Porcelain White", hexCode: "#f4f6f7", imaginStudioColorCode: null, oemPaintName: "Porcelain White" },
+      { id: "col-ola-blue", vehicleId: "veh-ola-s1", name: "Midnight Blue", hexCode: "#1c3558", imaginStudioColorCode: null, oemPaintName: "Midnight Blue" },
+      { id: "col-ola-black", vehicleId: "veh-ola-s1", name: "Jet Black", hexCode: "#16181c", imaginStudioColorCode: null, oemPaintName: "Jet Black" },
+      { id: "col-ola-silver", vehicleId: "veh-ola-s1", name: "Liquid Silver", hexCode: "#b8bec4", imaginStudioColorCode: null, oemPaintName: "Liquid Silver" },
+    ],
+    images: kit("veh-ola-s1", "ola-s1", ["ola-s1-1.jpg", "ola-s1-2.jpg"]),
+  },
+  {
+    id: "veh-ducati-panigale-v4",
+    slug: "ducati-panigale-v4",
+    name: "Ducati Panigale V4",
+    type: "BIKE",
+    brand: "Ducati",
+    bodyType: "Superbike",
+    safetyRatingNCAP: null,
+    isElectric: false,
+    luggageCapacityBags: null,
+    realMileageKmPerLitre: 14.0,
+    bestForHeadline: "A track-bred superbike you can still ride to the cafe",
+    variants: [
+      { id: "var-panigale-v4", vehicleId: "veh-ducati-panigale-v4", name: "Panigale V4", fuelType: "PETROL", transmissionType: "MANUAL", exShowroomPricePence: inr(27_50_000), engineCc: 1103, seatingCapacity: 2, isPopular: false },
+      { id: "var-panigale-v4s", vehicleId: "veh-ducati-panigale-v4", name: "Panigale V4 S", fuelType: "PETROL", transmissionType: "MANUAL", exShowroomPricePence: inr(33_50_000), engineCc: 1103, seatingCapacity: 2, isPopular: true },
+      { id: "var-panigale-v4s-corse", vehicleId: "veh-ducati-panigale-v4", name: "Panigale V4 S Corse", fuelType: "PETROL", transmissionType: "MANUAL", exShowroomPricePence: inr(36_00_000), engineCc: 1103, seatingCapacity: 2, isPopular: false },
+    ],
+    colors: [
+      { id: "col-panigale-red", vehicleId: "veh-ducati-panigale-v4", name: "Ducati Red", hexCode: "#c8102e", imaginStudioColorCode: "red", oemPaintName: "Ducati Red" },
+      { id: "col-panigale-stealth", vehicleId: "veh-ducati-panigale-v4", name: "Dark Stealth", hexCode: "#1a1c1f", imaginStudioColorCode: "black", oemPaintName: "Dark Stealth" },
+    ],
+    images: kit("veh-ducati-panigale-v4", "ducati-panigale-v4", [
+      "ducati-panigale-v4-1.jpg",
+      "ducati-panigale-v4-2.jpg",
+    ]),
+  },
 ];
+
+export const vehicles: VehicleWithRelations[] = rawVehicles.map(finaliseVehicle);
 
 // ---------------------------------------------------------------------------
 // State road tax slabs
@@ -324,6 +558,44 @@ export const rtoTaxRules: RtoTaxRule[] = [
   evExemption("rto-ka-car-ev", "KA", "CAR"),
   evExemption("rto-ka-bike-ev", "KA", "BIKE"),
 ];
+
+const CITY_TAX: Record<
+  string,
+  { car: number; bike: number; cess: number }
+> = {
+  Lucknow: { car: 8, bike: 7, cess: inr(1_500) },
+  Noida: { car: 8, bike: 7, cess: inr(1_500) },
+  "New Delhi": { car: 7, bike: 4, cess: 0 },
+  Mumbai: { car: 12, bike: 10, cess: 0 },
+  Pune: { car: 12, bike: 10, cess: 0 },
+  Bengaluru: { car: 14, bike: 12, cess: inr(2_000) },
+};
+
+const CITY_FUELS: FuelType[] = ["PETROL", "DIESEL", "CNG", "ELECTRIC", "HYBRID"];
+
+function cityRateId(
+  city: string,
+  vehicleType: VehicleType,
+  fuel: FuelType,
+): string {
+  return `rate-${city.toLowerCase().replace(/\s+/g, "-")}-${vehicleType.toLowerCase()}-${fuel.toLowerCase()}`;
+}
+
+/** City-level rates the live quote engine prefers over a state-wide band. */
+export const rtoTaxRates: RtoTaxRate[] = serviceCities.flatMap((city) => {
+  const slab = CITY_TAX[city.name] ?? { car: 8, bike: 7, cess: 0 };
+  return (["CAR", "BIKE"] as VehicleType[]).flatMap((vehicleType) =>
+    CITY_FUELS.map((fuelType) => ({
+      id: cityRateId(city.name, vehicleType, fuelType),
+      stateCode: city.stateCode,
+      city: city.name,
+      vehicleType,
+      fuelType,
+      taxPercent: fuelType === "ELECTRIC" ? 0 : vehicleType === "CAR" ? slab.car : slab.bike,
+      fixedCess: fuelType === "ELECTRIC" ? 0 : vehicleType === "CAR" ? slab.cess : Math.round(slab.cess / 5),
+    })),
+  );
+});
 
 // ---------------------------------------------------------------------------
 // Insurance bands (IRDAI third-party tariff, approximate)

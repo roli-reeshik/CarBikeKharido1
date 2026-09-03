@@ -5,15 +5,17 @@ import { useState } from "react";
 
 import { EmiCalculatorWidget } from "@/components/EmiCalculatorWidget";
 import { siteConfig } from "@/lib/siteConfig";
-import type { InsuranceRule, RtoTaxRule, VehicleWithRelations } from "@/lib/catalogue/types";
+import type { InsuranceRule, RtoTaxRate, RtoTaxRule, VehicleWithRelations } from "@/lib/catalogue/types";
 
 export function VdpMoreTools({
   vehicle,
   rtoRules,
+  rtoRates,
   insuranceRules,
 }: {
   vehicle: VehicleWithRelations;
   rtoRules: RtoTaxRule[];
+  rtoRates?: RtoTaxRate[];
   insuranceRules: InsuranceRule[];
 }) {
   const [brochureNote, setBrochureNote] = useState("");
@@ -25,7 +27,7 @@ export function VdpMoreTools({
       "",
       vehicle.bestForHeadline,
       `Body: ${vehicle.bodyType}`,
-      `Real-world mileage: ${vehicle.realMileageKmPerLitre}`,
+      `Real-world mileage: ${vehicle.realMileage ?? vehicle.realMileageKmPerLitre}`,
       "",
       `Principal Developer: ${siteConfig.developer.name}`,
       `Contact: ${siteConfig.contact.mobile} · ${siteConfig.contact.email}`,
@@ -73,7 +75,7 @@ export function VdpMoreTools({
         <p className="text-xs text-emerald-700 dark:text-emerald-400">{brochureNote}</p>
       ) : null}
 
-      <EmiCalculatorWidget rtoRules={rtoRules} insuranceRules={insuranceRules} />
+      <EmiCalculatorWidget rtoRules={rtoRules} rtoRates={rtoRates} insuranceRules={insuranceRules} />
     </div>
   );
 }
