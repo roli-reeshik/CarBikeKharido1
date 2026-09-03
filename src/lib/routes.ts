@@ -2,7 +2,9 @@ import type { VehicleType } from "@/lib/catalogue/types";
 
 const KNOWN_BIKES = new Set([
   "royal-enfield-classic-350",
+  "royal-enfield-hunter-350",
   "tvs-iqube",
+  "tvs-apache-rtr",
   "ola-s1",
   "ducati-panigale-v4",
 ]);
