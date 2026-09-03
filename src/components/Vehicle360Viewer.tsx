@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useCallback, useRef, useState } from "react";
 
 import { PhotoCredit } from "@/components/ui/PhotoCredit";
+import { VehicleImage } from "@/components/ui/VehicleImage";
 import {
   HERO_ANGLE,
   TOTAL_ANGLES,
@@ -24,6 +25,8 @@ interface Vehicle360ViewerProps {
   /** IMAGIN paint id for the selected colour. */
   paintCode?: string | null;
   alt: string;
+  slug?: string;
+  bodyType?: string;
   /** Shown when IMAGIN is not configured, or a frame fails to load. */
   fallbackPhotos: CarPhoto[];
   className?: string;
@@ -45,6 +48,8 @@ export function Vehicle360Viewer({
   model,
   paintCode,
   alt,
+  slug,
+  bodyType,
   fallbackPhotos,
   className,
 }: Vehicle360ViewerProps) {
@@ -109,11 +114,13 @@ export function Vehicle360Viewer({
     return (
       <figure className={className}>
         <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-100 dark:border-slate-800 dark:bg-slate-800">
-          <Image
+          <VehicleImage
             src={photo.src}
             alt={alt}
             fill
             priority
+            slug={slug}
+            bodyType={bodyType}
             sizes="(max-width: 1024px) 100vw, 60vw"
             className="object-cover"
           />

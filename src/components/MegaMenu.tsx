@@ -2,11 +2,12 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Bike, Car, ChevronDown, ChevronRight, Newspaper, PlayCircle, Recycle } from "lucide-react";
-import { useRef, useState } from "react";
+import Link from "next/link";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { ExplainTooltip } from "@/components/ExplainTooltip";
 import { useCity } from "@/components/providers/CityProvider";
-import { requestCatalogLens } from "@/lib/catalogFocus";
+import { useClickOutside, useEscapeKey } from "@/lib/hooks";
 import { megaCategories, type MegaChild, type MegaItem } from "@/lib/megaMenu";
 import { cn } from "@/lib/utils";
 
@@ -20,96 +21,66 @@ const categoryIcons = {
   videos: PlayCircle,
 } as const;
 
-function followHref(
-  href: string,
-  extras?: { lens?: string; cityId?: string; setCityId?: (id: string) => void },
-) {
-  if (extras?.cityId && extras.setCityId) extras.setCityId(extras.cityId);
-  if (extras?.lens) requestCatalogLens(extras.lens);
-  const id = href.startsWith("#") ? href.slice(1) : href;
-  document.getElementById(id)?.scrollIntoView({
-    behavior: "smooth",
-    block: "start",
-  });
-}
-
-function ItemRow({
+function MenuLink({
   item,
   nested,
-  categoryLens,
-  onNested,
   onNavigate,
+  onFocusNested,
 }: {
-  item: MegaItem;
-  nested: boolean;
-  categoryLens?: string;
-  onNested: () => void;
+  item: MegaItem | MegaChild;
+  nested?: boolean;
   onNavigate: () => void;
+  onFocusNested?: () => void;
 }) {
   const { setCityId } = useCity();
-  const hasKids = Boolean(item.children?.length);
+  const hasKids = "children" in item && Boolean(item.children?.length);
+
+  if ("explain" in item && item.explain) {
+    return (
+      <span className="block rounded-xl px-3 py-2 text-sm text-slate-700 dark:text-slate-200">
+        <ExplainTooltip term={item.explain.term} meaning={item.explain.meaning} />
+      </span>
+    );
+  }
 
   return (
-    <div
+    <Link
+      href={item.href}
+      onFocus={onFocusNested}
+      onMouseEnter={onFocusNested}
+      onClick={() => {
+        if (item.cityId) setCityId(item.cityId);
+        onNavigate();
+      }}
       className={cn(
-        "flex w-full items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm transition-colors",
+        "flex w-full items-start justify-between gap-2 rounded-xl px-3 py-2 text-left transition-colors",
         nested
           ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white"
           : "text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800/70",
       )}
-      onMouseEnter={hasKids ? onNested : undefined}
     >
-      {item.explain ? (
-        <span className="min-w-0 flex-1 truncate">
-          <ExplainTooltip
-            term={item.explain.term}
-            meaning={item.explain.meaning}
-          />
-        </span>
-      ) : (
-        <button
-          type="button"
-          onFocus={hasKids ? onNested : undefined}
-          onClick={() => {
-            if (hasKids) {
-              onNested();
-              return;
-            }
-            followHref(item.href, {
-              lens: item.lens ?? categoryLens,
-              cityId: item.cityId,
-              setCityId,
-            });
-            onNavigate();
-          }}
-          className="flex min-w-0 flex-1 items-center gap-2 text-left"
-        >
-          <span className="truncate">{item.label}</span>
-          {item.hint ? (
-            <span className="shrink-0 rounded-full bg-amber-50 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">
-              {item.hint}
-            </span>
-          ) : null}
-        </button>
-      )}
+      <span className="min-w-0">
+        <span className="block text-sm font-medium">{item.label}</span>
+        {item.subtext ? (
+          <span className="mt-0.5 block text-xs leading-snug text-slate-500 dark:text-slate-400">
+            {item.subtext}
+          </span>
+        ) : null}
+      </span>
       {hasKids ? (
-        <ChevronRight className="size-3.5 shrink-0 text-slate-400" aria-hidden />
+        <ChevronRight className="mt-0.5 size-3.5 shrink-0 text-slate-400" aria-hidden />
       ) : null}
-    </div>
+    </Link>
   );
 }
 
 function NestedList({
   item,
-  categoryLens,
   onNavigate,
 }: {
   item: MegaItem;
-  categoryLens?: string;
   onNavigate: () => void;
 }) {
-  const { setCityId } = useCity();
-
   return (
     <motion.div
       key={item.label}
@@ -117,28 +88,15 @@ function NestedList({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 12 }}
       transition={spring}
-      className="min-w-48 rounded-2xl border border-slate-100 bg-slate-50/80 p-3 dark:border-slate-800 dark:bg-slate-800/40"
+      className="min-w-56 rounded-2xl border border-slate-100 bg-slate-50/80 p-3 dark:border-slate-800 dark:bg-slate-800/40"
     >
       <p className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
         {item.label}
       </p>
       <ul className="space-y-0.5">
-        {item.children?.map((child: MegaChild) => (
+        {item.children?.map((child) => (
           <li key={child.label}>
-            <button
-              type="button"
-              onClick={() => {
-                followHref(child.href, {
-                  lens: child.lens ?? item.lens ?? categoryLens,
-                  cityId: child.cityId,
-                  setCityId,
-                });
-                onNavigate();
-              }}
-              className="w-full rounded-xl px-3 py-2 text-left text-sm text-slate-700 hover:bg-white dark:text-slate-200 dark:hover:bg-slate-900"
-            >
-              {child.label}
-            </button>
+            <MenuLink item={child} onNavigate={onNavigate} />
           </li>
         ))}
       </ul>
@@ -150,9 +108,27 @@ export function MegaMenu() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [nestedKey, setNestedKey] = useState<string | null>(null);
   const closeTimer = useRef<number>(0);
+  const navRef = useRef<HTMLElement>(null);
+  const triggerRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const activeIdRef = useRef<string | null>(null);
+  const pendingPanelFocus = useRef(false);
 
-  const open = (id: string) => {
+  activeIdRef.current = activeId;
+
+  const close = useCallback((restoreFocus = false) => {
     window.clearTimeout(closeTimer.current);
+    const id = activeIdRef.current;
+    pendingPanelFocus.current = false;
+    setActiveId(null);
+    setNestedKey(null);
+    if (restoreFocus && id) {
+      triggerRefs.current[id]?.focus();
+    }
+  }, []);
+
+  const open = (id: string, focusPanel = false) => {
+    window.clearTimeout(closeTimer.current);
+    pendingPanelFocus.current = focusPanel;
     setActiveId(id);
     setNestedKey(null);
   };
@@ -160,35 +136,89 @@ export function MegaMenu() {
   const scheduleClose = () => {
     window.clearTimeout(closeTimer.current);
     closeTimer.current = window.setTimeout(() => {
-      setActiveId(null);
-      setNestedKey(null);
+      if (navRef.current?.contains(document.activeElement)) return;
+      close();
     }, 160);
   };
+
+  useEscapeKey(() => close(true), Boolean(activeId));
+  useClickOutside(navRef, () => close(), Boolean(activeId));
+
+  useEffect(() => {
+    if (!activeId || !pendingPanelFocus.current) return;
+    pendingPanelFocus.current = false;
+    document
+      .querySelector<HTMLAnchorElement>(`#mega-panel-${activeId} a`)
+      ?.focus();
+  }, [activeId]);
 
   const active = megaCategories.find((category) => category.id === activeId);
   const nestedItem = active
     ?.columns.flatMap((column) => column.items)
     .find((item) => item.label === nestedKey);
+  const categoryIds = megaCategories.map((category) => category.id);
 
   return (
     <nav
+      ref={navRef}
       aria-label="Primary"
       className="hidden lg:block"
       onMouseLeave={scheduleClose}
     >
       <ul className="flex items-center gap-0.5">
-        {megaCategories.map((category) => {
+        {megaCategories.map((category, categoryIndex) => {
           const isOn = category.id === activeId;
           const Icon = categoryIcons[category.id as keyof typeof categoryIcons];
+          const panelId = `mega-panel-${category.id}`;
           return (
             <li key={category.id}>
               <button
                 type="button"
+                ref={(node) => {
+                  triggerRefs.current[category.id] = node;
+                }}
                 aria-expanded={isOn}
                 aria-haspopup="true"
+                aria-controls={panelId}
                 onMouseEnter={() => open(category.id)}
-                onFocus={() => open(category.id)}
-                onClick={() => open(category.id)}
+                onClick={() => (isOn ? close() : open(category.id))}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    if (isOn) {
+                      close();
+                    } else {
+                      open(category.id, true);
+                    }
+                  }
+                  if (event.key === "ArrowDown") {
+                    event.preventDefault();
+                    open(category.id, true);
+                  }
+                  if (event.key === "ArrowRight") {
+                    event.preventDefault();
+                    const next =
+                      categoryIds[(categoryIndex + 1) % categoryIds.length];
+                    open(next);
+                    triggerRefs.current[next]?.focus();
+                  }
+                  if (event.key === "ArrowLeft") {
+                    event.preventDefault();
+                    const prev =
+                      categoryIds[
+                        (categoryIndex - 1 + categoryIds.length) %
+                          categoryIds.length
+                      ];
+                    open(prev);
+                    triggerRefs.current[prev]?.focus();
+                  }
+                  if (event.key === "Tab" && !event.shiftKey && isOn) {
+                    event.preventDefault();
+                    document
+                      .querySelector<HTMLAnchorElement>(`#${panelId} a`)
+                      ?.focus();
+                  }
+                }}
                 className={cn(
                   "relative whitespace-nowrap rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors",
                   isOn
@@ -224,11 +254,29 @@ export function MegaMenu() {
         {active ? (
           <motion.div
             key={active.id}
+            id={`mega-panel-${active.id}`}
+            role="region"
+            aria-label={`${active.label} menu`}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             transition={spring}
             onMouseEnter={() => window.clearTimeout(closeTimer.current)}
+            onKeyDown={(event) => {
+              if (event.key !== "Tab") return;
+              const links = Array.from(
+                event.currentTarget.querySelectorAll<HTMLAnchorElement>("a"),
+              );
+              if (links.length === 0) return;
+              const first = links[0];
+              const last = links[links.length - 1];
+              if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                triggerRefs.current[active.id]?.focus();
+              } else if (!event.shiftKey && document.activeElement === last) {
+                close();
+              }
+            }}
             className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-slate-200/80 bg-white/95 shadow-lift backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/95"
           >
             <div
@@ -256,12 +304,11 @@ export function MegaMenu() {
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: 0.03 * (columnIndex * 4 + itemIndex) }}
                         >
-                          <ItemRow
+                          <MenuLink
                             item={item}
                             nested={nestedKey === item.label}
-                            categoryLens={active.lens}
-                            onNested={() => setNestedKey(item.label)}
-                            onNavigate={scheduleClose}
+                            onFocusNested={() => setNestedKey(item.label)}
+                            onNavigate={close}
                           />
                         </motion.li>
                       ))}
@@ -272,11 +319,7 @@ export function MegaMenu() {
 
               <AnimatePresence mode="wait">
                 {nestedItem?.children ? (
-                  <NestedList
-                    item={nestedItem}
-                    categoryLens={active.lens}
-                    onNavigate={scheduleClose}
-                  />
+                  <NestedList item={nestedItem} onNavigate={close} />
                 ) : null}
               </AnimatePresence>
             </div>
@@ -327,37 +370,43 @@ export function MobileMegaAccordion({ onNavigate }: { onNavigate: () => void }) 
                     {category.columns.flatMap((column) =>
                       column.items.flatMap((item) => [
                         <li key={item.label}>
-                          <button
-                            type="button"
+                          <Link
+                            href={item.href}
                             onClick={() => {
-                              followHref(item.href, {
-                                lens: item.lens ?? category.lens,
-                                cityId: item.cityId,
-                                setCityId,
-                              });
+                              if (item.cityId) setCityId(item.cityId);
                               onNavigate();
                             }}
-                            className="w-full rounded-lg px-2 py-1.5 text-left text-sm font-medium text-slate-700 dark:text-slate-200"
+                            className="block rounded-lg px-2 py-1.5 text-left"
                           >
-                            {item.label}
-                          </button>
+                            <span className="block text-sm font-medium text-slate-700 dark:text-slate-200">
+                              {item.label}
+                            </span>
+                            {item.subtext ? (
+                              <span className="block text-xs text-slate-500 dark:text-slate-400">
+                                {item.subtext}
+                              </span>
+                            ) : null}
+                          </Link>
                         </li>,
                         ...(item.children ?? []).map((child) => (
                           <li key={`${item.label}-${child.label}`}>
-                            <button
-                              type="button"
+                            <Link
+                              href={child.href}
                               onClick={() => {
-                                followHref(child.href, {
-                                  lens: child.lens ?? item.lens ?? category.lens,
-                                  cityId: child.cityId,
-                                  setCityId,
-                                });
+                                if (child.cityId) setCityId(child.cityId);
                                 onNavigate();
                               }}
-                              className="w-full rounded-lg px-5 py-1.5 text-left text-sm text-slate-500 dark:text-slate-400"
+                              className="block rounded-lg px-5 py-1.5 text-left"
                             >
-                              {child.label}
-                            </button>
+                              <span className="block text-sm text-slate-500 dark:text-slate-400">
+                                {child.label}
+                              </span>
+                              {child.subtext ? (
+                                <span className="block text-xs text-slate-400">
+                                  {child.subtext}
+                                </span>
+                              ) : null}
+                            </Link>
                           </li>
                         )),
                       ]),

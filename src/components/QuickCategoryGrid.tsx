@@ -3,9 +3,11 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight, Fuel, ShieldCheck, TrafficCone, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import Link from "next/link";
 
 import { accent } from "@/lib/accents";
 import { hasAutomatic, hasFuel } from "@/lib/catalogue/copy";
+import { catalogPath } from "@/lib/catalogue/filters";
 import type { VehicleWithRelations } from "@/lib/catalogue/types";
 import { categoryTiles } from "@/lib/data";
 import type { CategoryId } from "@/lib/types";
@@ -16,6 +18,13 @@ const categoryIcons: Record<CategoryId, LucideIcon> = {
   cityAutomatic: TrafficCone,
   cheapToRun: Fuel,
   familyHauler: Users,
+};
+
+const categoryHrefs: Record<CategoryId, string> = {
+  safety: catalogPath("cars", { popular: "top10" }),
+  cityAutomatic: catalogPath("cars"),
+  cheapToRun: catalogPath("cars", { fuel: "cng" }),
+  familyHauler: catalogPath("cars", { body: "muv" }),
 };
 
 function matchingVehicles(
@@ -62,13 +71,13 @@ export function QuickCategoryGrid({
             about in a showroom.
           </p>
         </div>
-        <button
-          type="button"
+        <Link
+          href={catalogPath("cars")}
           className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200/80 bg-white/70 px-3.5 py-2 text-sm font-medium text-slate-700 transition-colors hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-200"
         >
           Browse all shortlists
           <ArrowUpRight className="size-4" aria-hidden />
-        </button>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:auto-rows-[minmax(10.5rem,auto)]">
@@ -92,11 +101,15 @@ export function QuickCategoryGrid({
               }}
               whileHover={{ y: -4 }}
               className={cn(
-                "group relative isolate flex cursor-pointer flex-col overflow-hidden rounded-2xl border bg-white/80 p-5 shadow-micro backdrop-blur-sm transition-shadow hover:shadow-lift dark:bg-slate-900/60",
+                "group relative isolate overflow-hidden rounded-2xl border bg-white/80 shadow-micro backdrop-blur-sm transition-shadow hover:shadow-lift dark:bg-slate-900/60",
                 tone.border,
                 tile.span,
               )}
             >
+              <Link
+                href={categoryHrefs[tile.id]}
+                className="relative flex h-full flex-col p-5"
+              >
               <div
                 aria-hidden
                 className={cn(
@@ -174,6 +187,7 @@ export function QuickCategoryGrid({
                   />
                 </span>
               </div>
+              </Link>
             </motion.article>
           );
         })}

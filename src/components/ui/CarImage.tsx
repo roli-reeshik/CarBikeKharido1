@@ -1,9 +1,6 @@
 "use client";
 
-import Image from "next/image";
-import { useState } from "react";
-
-import { CarVisual } from "@/components/ui/CarVisual";
+import { VehicleImage } from "@/components/ui/VehicleImage";
 import type { Accent, CarPhoto } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { toCarPhotos } from "@/utils/getVehicleImage";
@@ -28,48 +25,37 @@ interface CarImageProps {
 }
 
 /**
- * A real photograph of the car, falling back to the illustrated silhouette when
- * no photo is available for that model or the file fails to load.
+ * Photograph of a catalogue vehicle. Missing or zero-byte local files fall
+ * through to the Unsplash map inside `VehicleImage` instead of a silhouette.
  */
 export function CarImage({
   carId,
   alt,
   bodyStyle,
-  accentKey,
+  accentKey: _accentKey,
   className,
   photoIndex = 0,
   sizes = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw",
   priority = false,
   showNote = true,
 }: CarImageProps) {
-  const [failed, setFailed] = useState(false);
   const photo = photosFor(carId)[photoIndex];
-
-  if (!photo || failed) {
-    return (
-      <CarVisual
-        bodyStyle={bodyStyle}
-        accentKey={accentKey}
-        caption={bodyStyle}
-        className={className}
-      />
-    );
-  }
 
   return (
     <div className={cn("relative overflow-hidden bg-slate-100 dark:bg-slate-800", className)}>
-      <Image
-        src={photo.src}
+      <VehicleImage
+        src={photo?.src ?? ""}
         alt={alt}
         fill
+        slug={carId}
+        bodyType={bodyStyle}
         sizes={sizes}
         priority={priority}
-        onError={() => setFailed(true)}
         className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
       />
 
-      {showNote && photo.note ? (
-        <p className="absolute inset-x-0 bottom-0 bg-slate-900/70 px-3 py-1.5 text-[11px] leading-snug text-white backdrop-blur-sm">
+      {showNote && photo?.note ? (
+        <p className="absolute inset-x-0 bottom-0 z-[2] bg-slate-900/70 px-3 py-1.5 text-[11px] leading-snug text-white backdrop-blur-sm">
           {photo.note}
         </p>
       ) : null}

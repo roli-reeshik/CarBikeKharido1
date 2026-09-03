@@ -1,0 +1,2 @@
+=== ALL MENU ITEMS PASSED ===
+All 34 discovered header and sub-menu links returned 200 OK.

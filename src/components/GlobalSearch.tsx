@@ -176,6 +176,7 @@ export function GlobalSearch({
             className="rounded-full p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800"
           >
             <X className="size-3.5" aria-hidden />
+            <span className="sr-only">Clear search</span>
           </button>
         ) : (
           <kbd className="hidden shrink-0 rounded-md border border-slate-200 px-1.5 py-0.5 text-[10px] font-medium text-slate-400 lg:block dark:border-slate-700">

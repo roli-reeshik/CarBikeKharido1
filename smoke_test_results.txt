@@ -1,0 +1,26 @@
+=== SMOKE AUDIT REPORT: CarBikeKharido.com ===
+Date: 2026-09-03T02:31:34.583Z
+Target: https://car-bike-kharido1.vercel.app
+
+1. CONSOLE & JAVASCRIPT ERRORS (0):
+  None detected.
+
+2. BROKEN / 404 NETWORK ASSETS (0):
+  None detected.
+
+3. BROKEN NAVIGATION LINKS (0):
+  All internal links healthy.
+
+4. MISSING / ZERO-BYTE IMAGES (8):
+  - [Missing] src: https://car-bike-kharido1.vercel.app/_next/image?url=%2Fvehicles%2Fmahindra-xuv-3xo-1.jpg&w=3840&q=75 (alt: "Mahindra XUV 3XO")
+  - [Missing] src: https://car-bike-kharido1.vercel.app/_next/image?url=%2Fvehicles%2Fmahindra-thar-1.jpg&w=3840&q=75 (alt: "Mahindra Thar ROXX")
+  - [Missing] src: https://car-bike-kharido1.vercel.app/_next/image?url=%2Fvehicles%2Ftata-punch-ev-1.png&w=3840&q=75 (alt: "Tata Punch EV")
+  - [Missing] src: https://car-bike-kharido1.vercel.app/_next/image?url=%2Fvehicles%2Fmaruti-ertiga-1.jpg&w=3840&q=75 (alt: "Maruti Suzuki Ertiga")
+  - [Missing] src: https://car-bike-kharido1.vercel.app/_next/image?url=%2Fvehicles%2Froyal-enfield-classic-350-1.jpg&w=3840&q=75 (alt: "Royal Enfield Classic 350")
+  - [Missing] src: https://car-bike-kharido1.vercel.app/_next/image?url=%2Fvehicles%2Ftvs-iqube-1.jpg&w=3840&q=75 (alt: "TVS iQube")
+  - [Missing] src: https://car-bike-kharido1.vercel.app/_next/image?url=%2Fvehicles%2Fola-s1-1.jpg&w=3840&q=75 (alt: "Ola S1")
+  - [Missing] src: https://car-bike-kharido1.vercel.app/_next/image?url=%2Fvehicles%2Fducati-panigale-v4-1.jpg&w=3840&q=75 (alt: "Ducati Panigale V4")
+
+5. DISABLED BUTTONS (0):
+  All buttons active.
+==============================================

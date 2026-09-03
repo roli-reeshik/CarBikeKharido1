@@ -31,6 +31,8 @@ export function VehicleHero({
         model={imaginModelName(vehicle)}
         paintCode={colour?.imaginColorCode ?? colour?.imaginStudioColorCode}
         alt={vehicle.name}
+        slug={vehicle.slug}
+        bodyType={vehicle.bodyType}
         fallbackPhotos={photos}
       />
       {vehicle.colors.length > 0 ? (

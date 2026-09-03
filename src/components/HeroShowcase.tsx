@@ -2,9 +2,9 @@
 
 import { motion } from "framer-motion";
 import { ArrowRight, Bike, Car } from "lucide-react";
-import Image from "next/image";
 import { useState } from "react";
 
+import { VehicleImage } from "@/components/ui/VehicleImage";
 import { cn } from "@/lib/utils";
 import { getVehicleImage } from "@/utils/getVehicleImage";
 
@@ -17,6 +17,8 @@ const bikePhoto = getVehicleImage("ducati-panigale-v4");
 
 const panels = {
   CAR: {
+    slug: "hyundai-creta",
+    bodyType: "Midsize SUV",
     image: carPhoto.src,
     alt: carPhoto.alt,
     badge: "Cars",
@@ -28,6 +30,8 @@ const panels = {
     object: "object-[center_55%]",
   },
   BIKE: {
+    slug: "ducati-panigale-v4",
+    bodyType: "Superbike",
     image: bikePhoto.src,
     alt: bikePhoto.alt,
     badge: "Two-wheelers",
@@ -112,12 +116,15 @@ function ShowcasePanel({
         animate={{ scale: active ? 1.06 : 1 }}
         transition={splitSpring}
       >
-        <Image
+        <VehicleImage
           src={copy.image}
           alt={copy.alt}
           fill
           priority
           quality={90}
+          slug={copy.slug}
+          category={kind}
+          bodyType={copy.bodyType}
           sizes="(max-width: 1023px) 100vw, 58vw"
           className={cn("object-cover", copy.object)}
         />

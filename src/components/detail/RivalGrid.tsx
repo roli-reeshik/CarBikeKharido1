@@ -59,6 +59,7 @@ export function RivalGrid({ rivals, carName }: { rivals: Rival[]; carName: strin
           {rival.carId ? (
             <Link
               href={vehiclePathBySlug(rival.carId)}
+              aria-label={`View details and on-road price for ${rival.brand} ${rival.model}`}
               className="group mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-slate-900 dark:text-white"
             >
               See full details

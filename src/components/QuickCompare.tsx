@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+import Link from "next/link";
+
 import { CarImage } from "@/components/ui/CarImage";
 import { StarRating } from "@/components/ui/StarRating";
 import {
@@ -27,6 +29,7 @@ import {
   type VehicleWithRelations,
 } from "@/lib/catalogue/types";
 import { formatPaiseRange } from "@/lib/money";
+import { vehiclePath } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
 type CompareKey =
@@ -123,14 +126,23 @@ function VehiclePicker({
 function VehicleHeader({ vehicle }: { vehicle: VehicleWithRelations }) {
   return (
     <div className="group">
-      <CarImage
-        carId={vehicle.slug}
-        alt={vehicle.name}
-        bodyStyle={vehicle.bodyType}
-        accentKey={vehicleAccent(vehicle.slug)}
-        className="h-24 sm:h-28"
-        showNote={false}
-      />
+      <Link
+        href={vehiclePath(vehicle)}
+        aria-label={`View details and on-road price for ${vehicle.name}`}
+        className="block overflow-hidden rounded-xl"
+      >
+        <span className="sr-only">
+          View details and on-road price for {vehicle.name}
+        </span>
+        <CarImage
+          carId={vehicle.slug}
+          alt=""
+          bodyStyle={vehicle.bodyType}
+          accentKey={vehicleAccent(vehicle.slug)}
+          className="h-24 sm:h-28"
+          showNote={false}
+        />
+      </Link>
       <p className="mt-2 truncate text-sm font-semibold text-slate-900 dark:text-white">
         {vehicle.name}
       </p>
@@ -262,6 +274,7 @@ export function QuickCompare({ vehicles }: { vehicles: VehicleWithRelations[] })
               className="mx-auto grid size-9 place-items-center rounded-xl border border-slate-200 bg-white text-slate-500 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
             >
               <ArrowLeftRight className="size-4" aria-hidden />
+              <span className="sr-only">Swap the two vehicles</span>
             </motion.button>
             <VehiclePicker
               label="Second vehicle"

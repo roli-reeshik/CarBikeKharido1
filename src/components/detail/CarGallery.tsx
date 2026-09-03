@@ -1,11 +1,11 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import Image from "next/image";
 import { useState } from "react";
 
 import { CarVisual } from "@/components/ui/CarVisual";
 import { PhotoCredit } from "@/components/ui/PhotoCredit";
+import { VehicleImage } from "@/components/ui/VehicleImage";
 import type { Accent, CarPhoto } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -14,13 +14,20 @@ interface CarGalleryProps {
   alt: string;
   bodyStyle: string;
   accentKey: Accent;
+  slug?: string;
 }
 
 /**
  * Hero gallery: one large photo with a thumbnail strip. Falls back to the
  * illustrated silhouette when we have no photography for the model.
  */
-export function CarGallery({ photos, alt, bodyStyle, accentKey }: CarGalleryProps) {
+export function CarGallery({
+  photos,
+  alt,
+  bodyStyle,
+  accentKey,
+  slug,
+}: CarGalleryProps) {
   const [active, setActive] = useState(0);
 
   if (photos.length === 0) {
@@ -48,11 +55,13 @@ export function CarGallery({ photos, alt, bodyStyle, accentKey }: CarGalleryProp
             transition={{ duration: 0.35, ease: "easeOut" }}
             className="absolute inset-0"
           >
-            <Image
+            <VehicleImage
               src={photo.src}
               alt={alt}
               fill
               priority
+              slug={slug}
+              bodyType={bodyStyle}
               sizes="(max-width: 1024px) 100vw, 60vw"
               className="object-cover"
             />
@@ -87,10 +96,12 @@ export function CarGallery({ photos, alt, bodyStyle, accentKey }: CarGalleryProp
                   : "border-transparent opacity-70 hover:opacity-100",
               )}
             >
-              <Image
+              <VehicleImage
                 src={item.src}
                 alt=""
                 fill
+                slug={slug}
+                bodyType={bodyStyle}
                 sizes="96px"
                 className="object-cover"
               />

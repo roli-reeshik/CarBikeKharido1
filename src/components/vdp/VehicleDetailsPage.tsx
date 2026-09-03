@@ -1,6 +1,5 @@
 import { Play } from "lucide-react";
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 
@@ -21,6 +20,7 @@ import { VdpMoreTools } from "@/components/vdp/VdpMoreTools";
 import { VehicleDetailsLayout } from "@/components/vdp/VehicleDetailsLayout";
 import { VehicleReviewSection } from "@/components/vdp/VehicleReviewSection";
 import { VehicleSubNav } from "@/components/vdp/VehicleSubNav";
+import { VehicleImage } from "@/components/ui/VehicleImage";
 import { carDetails } from "@/lib/carDetails";
 import { vehicleAccent } from "@/lib/catalogue/copy";
 import {
@@ -213,7 +213,12 @@ export async function VehicleDetailsPage({
                 />
                 <div className="space-y-4">
                   {reviews.map((section) => (
-                    <VehicleReviewSection key={section.id} section={section} />
+                    <VehicleReviewSection
+                      key={section.id}
+                      section={section}
+                      slug={vehicle.slug}
+                      bodyType={vehicle.bodyType}
+                    />
                   ))}
                 </div>
               </section>
@@ -282,6 +287,7 @@ export async function VehicleDetailsPage({
                     alt={vehicle.name}
                     bodyStyle={vehicle.bodyType}
                     accentKey={vehicleAccent(vehicle.slug)}
+                    slug={vehicle.slug}
                   />
                 </div>
               </section>
@@ -352,10 +358,12 @@ export async function VehicleDetailsPage({
                     >
                       <div className="relative aspect-video">
                         {photos[index % Math.max(photos.length, 1)] ? (
-                          <Image
+                          <VehicleImage
                             src={photos[index % photos.length].src}
                             alt=""
                             fill
+                            slug={vehicle.slug}
+                            bodyType={vehicle.bodyType}
                             sizes="33vw"
                             className="object-cover opacity-70"
                           />
@@ -363,9 +371,13 @@ export async function VehicleDetailsPage({
                           <div className="size-full bg-slate-800" />
                         )}
                         <span className="absolute inset-0 grid place-items-center">
-                          <span className="grid size-12 place-items-center rounded-full bg-white/90 text-slate-900">
+                          <span
+                            className="grid size-12 place-items-center rounded-full bg-white/90 text-slate-900"
+                            aria-hidden
+                          >
                             <Play className="size-5 fill-current" aria-hidden />
                           </span>
+                          <span className="sr-only">Play {video.title}</span>
                         </span>
                         <span className="absolute bottom-2 right-2 rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-semibold">
                           {video.duration}

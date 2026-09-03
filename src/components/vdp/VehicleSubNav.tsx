@@ -5,6 +5,7 @@ import { ChevronDown, GitCompare } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { useEscapeKey } from "@/lib/hooks";
 import { vehiclePathBySlug } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
@@ -48,6 +49,8 @@ export function VehicleSubNav({
   const [active, setActive] = useState("overview");
   const [openMenu, setOpenMenu] = useState<"compare" | "more" | null>(null);
 
+  useEscapeKey(() => setOpenMenu(null), Boolean(openMenu));
+
   useEffect(() => {
     const ids = tabs.map((tab) => tab.id);
     const observer = new IntersectionObserver(
@@ -79,6 +82,8 @@ export function VehicleSubNav({
               <li key={tab.id} className="relative shrink-0">
                 <button
                   type="button"
+                  aria-expanded={hasMenu ? openMenu === tab.id : undefined}
+                  aria-haspopup={hasMenu ? "true" : undefined}
                   onClick={() => {
                     if (hasMenu) {
                       setOpenMenu((current) =>
@@ -125,6 +130,7 @@ export function VehicleSubNav({
                             <li key={item.slug}>
                               <Link
                                 href={vehiclePathBySlug(item.slug)}
+                                aria-label={`View details and on-road price for ${item.label}`}
                                 className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
                                 onClick={() => setOpenMenu(null)}
                               >

@@ -29,6 +29,9 @@ export function ThemeToggle({ className }: { className?: string }) {
           <Sun className="size-4" aria-hidden />
         )}
       </span>
+      <span className="sr-only">
+        {isDark ? "Switch to light theme" : "Switch to dark theme"}
+      </span>
     </button>
   );
 }

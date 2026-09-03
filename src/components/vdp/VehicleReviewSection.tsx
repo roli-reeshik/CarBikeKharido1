@@ -9,9 +9,9 @@ import {
   Sparkles,
   Star,
 } from "lucide-react";
-import Image from "next/image";
 import { useState } from "react";
 
+import { VehicleImage } from "@/components/ui/VehicleImage";
 import type { VdpReviewSection } from "@/lib/vdpContent";
 import { cn } from "@/lib/utils";
 
@@ -26,8 +26,12 @@ const icons = {
 
 export function VehicleReviewSection({
   section,
+  slug,
+  bodyType,
 }: {
   section: VdpReviewSection;
+  slug?: string;
+  bodyType?: string;
 }) {
   const [open, setOpen] = useState(false);
   const Icon = icons[section.id as keyof typeof icons] ?? Sparkles;
@@ -37,10 +41,12 @@ export function VehicleReviewSection({
       <div className="grid gap-0 sm:grid-cols-[minmax(0,200px)_1fr]">
         {section.imageUrl ? (
           <div className="relative min-h-36 bg-slate-100 dark:bg-slate-800">
-            <Image
+            <VehicleImage
               src={section.imageUrl}
-              alt=""
+              alt={section.heading}
               fill
+              slug={slug}
+              bodyType={bodyType}
               sizes="200px"
               className="object-cover"
             />

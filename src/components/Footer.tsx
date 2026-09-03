@@ -2,39 +2,41 @@
 
 import { useState } from "react";
 import { Bike, Car, Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 
 import { AboutModal } from "@/components/AboutModal";
+import { catalogPath } from "@/lib/catalogue/filters";
 import { siteConfig } from "@/lib/siteConfig";
 
 const columns = [
   {
     title: "Cars",
     links: [
-      "New cars",
-      "Electric cars",
-      "7-seaters",
-      "Under ₹10 lakh",
-      "5-star safety",
+      { label: "New cars", href: catalogPath("cars") },
+      { label: "Electric cars", href: catalogPath("cars", { fuel: "ev" }) },
+      { label: "7-seaters", href: catalogPath("cars", { body: "muv" }) },
+      { label: "Under ₹10 lakh", href: catalogPath("cars", { maxLakh: "10" }) },
+      { label: "5-star safety", href: "/#trending" },
     ],
   },
   {
     title: "Bikes & scooters",
     links: [
-      "Commuter bikes",
-      "Electric scooters",
-      "Cruisers",
-      "Under ₹1 lakh",
-      "Best mileage",
+      { label: "Commuter bikes", href: catalogPath("bikes", { kind: "commuter" }) },
+      { label: "Electric scooters", href: catalogPath("bikes", { kind: "scooter" }) },
+      { label: "Cruisers", href: catalogPath("bikes", { kind: "cruiser" }) },
+      { label: "Under ₹1 lakh", href: catalogPath("bikes", { maxLakh: "1" }) },
+      { label: "Best mileage", href: catalogPath("bikes") },
     ],
   },
   {
     title: "Work out the cost",
     links: [
-      "On-road price by city",
-      "EMI calculator",
-      "Running cost per km",
-      "Insurance explainer",
-      "RTO tax by state",
+      { label: "On-road price by city", href: "/#money" },
+      { label: "EMI calculator", href: "/#money" },
+      { label: "Running cost per km", href: "/#money" },
+      { label: "Insurance explainer", href: "/#money" },
+      { label: "RTO tax by state", href: "/#money" },
     ],
   },
 ];
@@ -48,7 +50,12 @@ export function Footer() {
       <div className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.5fr_repeat(3,1fr)]">
           <div>
-            <div className="flex items-center gap-2">
+            <Link
+              href="/"
+              aria-label={`${siteConfig.name} home`}
+              className="inline-flex items-center gap-2"
+            >
+              <span className="sr-only">{siteConfig.name} home</span>
               <span className="grid size-9 place-items-center rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900">
                 <ShieldCheck className="size-5" aria-hidden />
               </span>
@@ -61,7 +68,7 @@ export function Footer() {
                   {siteConfig.wordmark.suffix}
                 </span>
               </span>
-            </div>
+            </Link>
 
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-slate-600 dark:text-slate-400">
               We describe cars and bikes the way owners talk about them — how
@@ -88,13 +95,13 @@ export function Footer() {
               </h2>
               <ul className="mt-3 space-y-2">
                 {column.links.map((link) => (
-                  <li key={link}>
-                    <a
-                      href="#top"
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
                       className="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                     >
-                      {link}
-                    </a>
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>

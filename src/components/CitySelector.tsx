@@ -43,6 +43,7 @@ export function CitySelector({
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         aria-haspopup="listbox"
+        aria-label={`On-road city, currently ${city.name}`}
         className={cn(
           "flex w-full items-center gap-2 text-left transition-colors",
           variant === "pill"

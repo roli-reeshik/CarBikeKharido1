@@ -2,10 +2,10 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Bike, Car, Recycle, Search } from "lucide-react";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 
 import { ExplainTooltip } from "@/components/ExplainTooltip";
+import { VehicleImage } from "@/components/ui/VehicleImage";
 import { requestCatalogLens } from "@/lib/catalogFocus";
 import { cn } from "@/lib/utils";
 import { getVehicleImage } from "@/utils/getVehicleImage";
@@ -41,6 +41,8 @@ const brands = [
 const slides = [
   {
     id: "nexon",
+    slug: "tata-nexon",
+    bodyType: "Compact SUV",
     badge: "COMPACT SUV",
     name: "Tata Nexon",
     headline: "A 5-star family SUV that still makes sense on a city fuel budget",
@@ -50,6 +52,8 @@ const slides = [
   },
   {
     id: "creta",
+    slug: "hyundai-creta",
+    bodyType: "Midsize SUV",
     badge: "MIDSIZE SUV",
     name: "Hyundai Creta",
     headline: "Highway trips in quiet comfort — every RTO rupee explained",
@@ -59,6 +63,8 @@ const slides = [
   },
   {
     id: "classic",
+    slug: "royal-enfield-classic-350",
+    bodyType: "Cruiser",
     badge: "CRUISER FEATURED",
     name: "Royal Enfield Classic 350",
     headline: "Weekend rides you actually look forward to",
@@ -111,12 +117,14 @@ export function HeroBanner({ onAdvancedSearch, onSearch }: HeroBannerProps) {
             transition={{ duration: 0.6 }}
             className="absolute inset-0"
           >
-            <Image
+            <VehicleImage
               src={current.image}
               alt={current.alt}
               fill
               priority={slide === 0}
               sizes="100vw"
+              slug={current.slug}
+              bodyType={current.bodyType}
               className="object-cover object-center"
             />
             <div className="absolute inset-0 bg-linear-to-r from-black/80 via-black/45 to-black/20" />

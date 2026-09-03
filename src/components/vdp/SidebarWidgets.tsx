@@ -2,10 +2,10 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, CalendarCheck, Phone } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
+import { VehicleImage } from "@/components/ui/VehicleImage";
 import { vehiclePathBySlug } from "@/lib/routes";
 import type { VdpSimilar } from "@/lib/vdpContent";
 import { cn } from "@/lib/utils";
@@ -96,6 +96,7 @@ export function SidebarWidgets({
                 {item.slug ? (
                   <Link
                     href={vehiclePathBySlug(item.slug)}
+                    aria-label={`View details and on-road price for ${item.name}`}
                     className="flex items-center gap-3 rounded-xl p-2 hover:bg-slate-50 dark:hover:bg-slate-800/70"
                   >
                     <SimilarThumb item={item} />
@@ -186,7 +187,14 @@ function SimilarThumb({ item }: { item: VdpSimilar }) {
   return (
     <span className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-800">
       {item.imageUrl ? (
-        <Image src={item.imageUrl} alt="" fill sizes="48px" className="object-cover" />
+        <VehicleImage
+          src={item.imageUrl}
+          alt={item.name}
+          fill
+          slug={item.slug ?? undefined}
+          sizes="48px"
+          className="object-cover"
+        />
       ) : (
         <span className="grid size-full place-items-center text-[10px] font-bold text-slate-400">
           {item.brand.slice(0, 2).toUpperCase()}

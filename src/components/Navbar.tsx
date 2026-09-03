@@ -26,6 +26,7 @@ export function Navbar() {
             className="flex shrink-0 items-center gap-2"
             aria-label={`${siteConfig.name} home`}
           >
+            <span className="sr-only">{siteConfig.name} home</span>
             <span className="grid size-9 place-items-center rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900">
               <ShieldCheck className="size-5" aria-hidden />
             </span>
@@ -58,6 +59,7 @@ export function Navbar() {
               aria-label="Saved cars"
             >
               <Heart className="size-4" aria-hidden />
+              <span className="sr-only">Saved cars</span>
             </button>
 
             <ThemeToggle />

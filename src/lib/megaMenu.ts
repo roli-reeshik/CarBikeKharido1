@@ -1,5 +1,8 @@
+import { catalogPath } from "@/lib/catalogue/filters";
+
 export interface MegaChild {
   label: string;
+  subtext?: string;
   href: string;
   cityId?: string;
   lens?: string;
@@ -7,6 +10,7 @@ export interface MegaChild {
 
 export interface MegaItem {
   label: string;
+  subtext?: string;
   href: string;
   hint?: string;
   lens?: string;
@@ -27,6 +31,11 @@ export interface MegaCategory {
   columns: MegaColumn[];
 }
 
+const cars = (params?: Parameters<typeof catalogPath>[1]) =>
+  catalogPath("cars", params);
+const bikes = (params?: Parameters<typeof catalogPath>[1]) =>
+  catalogPath("bikes", params);
+
 export const megaCategories: MegaCategory[] = [
   {
     id: "new-cars",
@@ -34,70 +43,67 @@ export const megaCategories: MegaCategory[] = [
     lens: "cars",
     columns: [
       {
-        title: "Explore",
+        title: "By body type",
         items: [
-          { label: "Explore New Cars", href: "#trending" },
           {
-            label: "Electric Cars",
-            href: "#trending",
-            children: [
-              { label: "All EVs", href: "#trending" },
-              { label: "Long-range family SUVs", href: "#trending" },
-              { label: "City runabouts", href: "#finder" },
-            ],
+            label: "SUVs",
+            subtext: "Family crossovers and off-road 4x4s",
+            href: cars({ body: "suv" }),
           },
           {
-            label: "Popular Cars",
-            href: "#trending",
-            children: [
-              { label: "Top SUVs", href: "#trending" },
-              { label: "Top sedans", href: "#trending" },
-              { label: "Under ₹10 lakh", href: "#finder" },
-            ],
+            label: "Hatchbacks",
+            subtext: "City cars with a usable boot",
+            href: cars({ body: "hatchback" }),
           },
-          { label: "Upcoming Cars", href: "#trending" },
-          { label: "New Launches", href: "#top" },
+          {
+            label: "Sedans",
+            subtext: "Highway saloons with a proper boot",
+            href: cars({ body: "sedan" }),
+          },
+          {
+            label: "MUVs",
+            subtext: "7-seaters adults will sit in",
+            href: cars({ body: "muv" }),
+          },
         ],
       },
       {
-        title: "Brands & tools",
+        title: "By fuel",
         items: [
           {
-            label: "Popular Brands",
-            href: "#trending",
-            children: [
-              { label: "Tata", href: "#trending" },
-              { label: "Mahindra", href: "#trending" },
-              { label: "Maruti Suzuki", href: "#trending" },
-              { label: "Hyundai", href: "#trending" },
-              { label: "Kia", href: "#trending" },
-            ],
+            label: "Electric cars",
+            subtext: "Battery-electric, real range figures",
+            href: cars({ fuel: "ev" }),
           },
-          { label: "Compare Cars", href: "#compare" },
-          { label: "New Car Offers & Discounts", href: "#money" },
-          { label: "Find Car Dealers", href: "#finder" },
+          {
+            label: "Hybrid cars",
+            subtext: "Petrol-electric when we list them",
+            href: cars({ fuel: "hybrid" }),
+          },
+          {
+            label: "CNG cars",
+            subtext: "Factory gas kits, honest running cost",
+            href: cars({ fuel: "cng" }),
+          },
         ],
       },
       {
-        title: "On the road",
+        title: "Popular",
         items: [
-          { label: "EV Charging Stations", href: "#finder" },
-          { label: "Fuel Stations & Live Fuel Prices", href: "#money" },
           {
-            label: "Gearboxes, explained",
-            href: "#finder",
-            explain: {
-              term: "AMT",
-              meaning: "A basic automatic — no clutch, but you still feel a small pause between gears.",
-            },
+            label: "Top 10 cars",
+            subtext: "What buyers shortlist first this week",
+            href: cars({ popular: "top10" }),
           },
           {
-            label: "Smooth automatics",
-            href: "#finder",
-            explain: {
-              term: "Torque converter",
-              meaning: "The buttery-smooth automatic — creeps forward in traffic with no clutch at all.",
-            },
+            label: "Best mileage cars",
+            subtext: "Ranked by real-world km per litre",
+            href: cars({ popular: "mileage" }),
+          },
+          {
+            label: "Luxury cars",
+            subtext: "The top of this catalogue by price",
+            href: cars({ popular: "luxury" }),
           },
         ],
       },
@@ -109,27 +115,29 @@ export const megaCategories: MegaCategory[] = [
     lens: "cars",
     columns: [
       {
-        title: "Buy",
+        title: "Buy used",
         items: [
-          { label: "Buy Used Cars", href: "#trending" },
           {
-            label: "Used Cars in Your City",
-            href: "#trending",
-            children: [
-              { label: "Lucknow (UP-32)", href: "#trending", cityId: "lucknow" },
-              { label: "Delhi (DL)", href: "#trending", cityId: "new-delhi" },
-              { label: "Mumbai (MH-01)", href: "#trending", cityId: "mumbai" },
-              { label: "Bengaluru (KA-01)", href: "#trending", cityId: "bengaluru" },
-            ],
+            label: "Used cars in Lucknow",
+            subtext: "On-road quotes for UP-32 while certified stock lists",
+            href: cars({ condition: "used", city: "lucknow" }),
+            cityId: "lucknow",
           },
-          { label: "Dealerships Near Me", href: "#finder" },
-        ],
-      },
-      {
-        title: "Sell",
-        items: [
-          { label: "Sell My Car", href: "#money", hint: "Instant valuation" },
-          { label: "Used Car Valuation Tool", href: "#money" },
+          {
+            label: "Certified pre-owned",
+            subtext: "Inspected cars — catalogue expanding",
+            href: cars({ condition: "used", certified: "1" }),
+          },
+          {
+            label: "Under ₹5 lakh",
+            subtext: "Entry used budget, including two-wheelers we can price",
+            href: cars({ condition: "used", maxLakh: "5" }),
+          },
+          {
+            label: "Used SUVs",
+            subtext: "Tall cars with luggage room",
+            href: cars({ condition: "used", body: "suv" }),
+          },
         ],
       },
     ],
@@ -140,27 +148,53 @@ export const megaCategories: MegaCategory[] = [
     lens: "bikes",
     columns: [
       {
-        title: "Explore",
+        title: "By type",
         items: [
-          { label: "Explore Bikes", href: "#trending" },
           {
-            label: "Superbikes",
-            href: "#trending",
-            children: [
-              { label: "Ducati", href: "#trending" },
-              { label: "Kawasaki", href: "#trending" },
-              { label: "BMW Motorrad", href: "#trending" },
-            ],
+            label: "Commuter bikes",
+            subtext: "Daily rides — scooters and relaxed cruisers",
+            href: bikes({ kind: "commuter" }),
           },
-          { label: "Electric Scooters & Bikes", href: "#trending" },
-          { label: "Popular Commuters", href: "#trending" },
+          {
+            label: "Sports bikes",
+            subtext: "Superbikes with an honest on-road number",
+            href: bikes({ kind: "sports" }),
+          },
+          {
+            label: "Cruisers",
+            subtext: "Upright weekend roadsters",
+            href: bikes({ kind: "cruiser" }),
+          },
+          {
+            label: "Electric scooters",
+            subtext: "Plug-in commuters, real range",
+            href: bikes({ kind: "scooter" }),
+          },
         ],
       },
       {
-        title: "Tools",
+        title: "Popular brands",
         items: [
-          { label: "Compare Bikes", href: "#compare" },
-          { label: "Two-Wheeler Dealers", href: "#finder" },
+          {
+            label: "Royal Enfield",
+            subtext: "Classic 350 and the rest of the line-up",
+            href: bikes({ brand: "royal-enfield" }),
+          },
+          {
+            label: "TVS",
+            subtext: "iQube and city two-wheelers",
+            href: bikes({ brand: "tvs" }),
+          },
+          {
+            label: "Ola",
+            subtext: "S1 electric scooters",
+            href: bikes({ brand: "ola" }),
+          },
+          {
+            label: "Ducati",
+            subtext: "Panigale V4 and track bikes",
+            href: bikes({ brand: "ducati" }),
+          },
         ],
       },
     ],
@@ -172,11 +206,21 @@ export const megaCategories: MegaCategory[] = [
       {
         title: "Read",
         items: [
-          { label: "News & Top Stories", href: "#top" },
-          { label: "Expert Road Tests", href: "#trending" },
-          { label: "Verified Owner Reviews", href: "#trending" },
-          { label: "Curated Car Collections", href: "#trending" },
-          { label: "Layman Buying Tips & Advice", href: "#finder" },
+          {
+            label: "Expert drive reviews",
+            subtext: "First drives in plain English, not brochure copy",
+            href: cars({ view: "reviews" }),
+          },
+          {
+            label: "Car buying guides",
+            subtext: "Luggage, traffic and the invoice — then decide",
+            href: cars({ view: "guides" }),
+          },
+          {
+            label: "Video walkarounds",
+            subtext: "Films on each vehicle page",
+            href: cars({ view: "videos" }),
+          },
         ],
       },
     ],
@@ -188,9 +232,21 @@ export const megaCategories: MegaCategory[] = [
       {
         title: "Watch",
         items: [
-          { label: "Video Reviews", href: "#top" },
-          { label: "Visual Stories", href: "#top", hint: "Reels-style" },
-          { label: "First Drive Impressions", href: "#top" },
+          {
+            label: "Car video walkarounds",
+            subtext: "First-drive films and owner diaries",
+            href: cars({ view: "videos" }),
+          },
+          {
+            label: "Two-wheeler walkarounds",
+            subtext: "Cruisers, scooters and superbikes on camera",
+            href: bikes({ view: "videos" }),
+          },
+          {
+            label: "Expert road tests",
+            subtext: "The same reviews, with the video player on the page",
+            href: cars({ view: "reviews" }),
+          },
         ],
       },
     ],

@@ -235,7 +235,7 @@ export function GuidedMatcherModal({
         >
           <button
             type="button"
-            aria-label="Close"
+            aria-label="Close help me choose"
             onClick={handleClose}
             className="absolute inset-0 cursor-default bg-slate-900/50 backdrop-blur-sm"
           />
@@ -266,10 +266,11 @@ export function GuidedMatcherModal({
               <button
                 type="button"
                 onClick={handleClose}
-                aria-label="Close"
+                aria-label="Close help me choose"
                 className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800"
               >
                 <X className="size-4" aria-hidden />
+                <span className="sr-only">Close help me choose</span>
               </button>
             </div>
 
@@ -298,16 +299,24 @@ export function GuidedMatcherModal({
                         accent(vehicleAccent(match.vehicle.slug)).border,
                       )}
                     >
-                      <div className="group">
+                      <Link
+                        href={vehiclePath(match.vehicle)}
+                        aria-label={`View details and on-road price for ${match.vehicle.name}`}
+                        onClick={handleClose}
+                        className="group block"
+                      >
+                        <span className="sr-only">
+                          View details and on-road price for {match.vehicle.name}
+                        </span>
                         <CarImage
                           carId={match.vehicle.slug}
-                          alt={match.vehicle.name}
+                          alt=""
                           bodyStyle={match.vehicle.bodyType}
                           accentKey={vehicleAccent(match.vehicle.slug)}
                           className="h-40"
                           showNote={false}
                         />
-                      </div>
+                      </Link>
                       <div className="space-y-3 p-4">
                         <div className="flex flex-wrap items-center gap-2">
                           <span
@@ -448,6 +457,11 @@ export function GuidedMatcherModal({
                   </button>
                   <Link
                     href={match ? vehiclePath(match.vehicle) : "/"}
+                    aria-label={
+                      match
+                        ? `View details and on-road price for ${match.vehicle.name}`
+                        : undefined
+                    }
                     onClick={handleClose}
                     className="inline-flex items-center gap-1.5 rounded-xl bg-violet-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-violet-500"
                   >
